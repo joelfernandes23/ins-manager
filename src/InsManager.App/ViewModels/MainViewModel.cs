@@ -26,6 +26,7 @@ public partial class MainViewModel : ObservableObject
     [ObservableProperty] private string _simBriefPilotId = "";
     [ObservableProperty] private string _selectedTheme = "Dark";
     [ObservableProperty] private string _selectedAircraft = "FSS Boeing 727";
+    [ObservableProperty] private DriftIntervalOption _selectedDriftInterval;
     [ObservableProperty] private bool _autoManageWaypoints = true;
     [ObservableProperty] private bool _correctDrift = true;
     [ObservableProperty] private bool _isConnected;
@@ -47,6 +48,7 @@ public partial class MainViewModel : ObservableObject
         _settingsService = settingsService;
         _simulatorConnection = simulatorConnection;
         _themeService = themeService;
+        _selectedDriftInterval = DriftIntervals[1];
         ResetSlots();
     }
 
@@ -54,6 +56,12 @@ public partial class MainViewModel : ObservableObject
     public ObservableCollection<FlightPlanLeg> FlightPlan { get; } = [];
     public IReadOnlyList<string> Themes { get; } = ["Dark", "Light"];
     public IReadOnlyList<string> SupportedAircraft { get; } = ["FSS Boeing 727"];
+    public IReadOnlyList<DriftIntervalOption> DriftIntervals { get; } =
+    [
+        new("10 minutes", 10),
+        new("30 minutes", 30),
+        new("1 hour", 60),
+    ];
     public IReadOnlyList<int> InsSlotNumbers { get; } = Enumerable.Range(1, 9).ToArray();
 
     public async Task InitializeAsync()
@@ -64,6 +72,8 @@ public partial class MainViewModel : ObservableObject
         SelectedAircraft = SupportedAircraft.Contains(settings.Aircraft)
             ? settings.Aircraft
             : SupportedAircraft[0];
+        SelectedDriftInterval = DriftIntervals.FirstOrDefault(option =>
+            option.Minutes == settings.DriftCorrectionIntervalMinutes) ?? DriftIntervals[1];
         _themeService.Apply(SelectedTheme);
     }
 
@@ -74,12 +84,21 @@ public partial class MainViewModel : ObservableObject
         if (IsConnected) _ = UpdateDriftCorrectionAsync(value);
     }
 
+    partial void OnSelectedDriftIntervalChanged(DriftIntervalOption value)
+    {
+        if (IsConnected && CorrectDrift) _ = UpdateDriftCorrectionAsync(true);
+    }
+
     private async Task UpdateDriftCorrectionAsync(bool enabled)
     {
         try
         {
-            await _simulatorConnection.SetDriftCorrectionEnabledAsync(enabled);
-            RouteStatus = enabled ? "Drift correction enabled" : "Drift correction disabled";
+            await _simulatorConnection.SetDriftCorrectionEnabledAsync(
+                enabled,
+                TimeSpan.FromMinutes(SelectedDriftInterval.Minutes));
+            RouteStatus = enabled
+                ? $"Drift correction every {SelectedDriftInterval.Label.ToLowerInvariant()}"
+                : "Drift correction disabled";
         }
         catch (Exception exception)
         {
@@ -96,7 +115,11 @@ public partial class MainViewModel : ObservableObject
     [RelayCommand]
     private async Task SaveSettingsAsync()
     {
-        await _settingsService.SaveAsync(new AppSettings(SimBriefPilotId.Trim(), SelectedTheme, SelectedAircraft));
+        await _settingsService.SaveAsync(new AppSettings(
+            SimBriefPilotId.Trim(),
+            SelectedTheme,
+            SelectedAircraft,
+            SelectedDriftInterval.Minutes));
         IsSettingsOpen = false;
     }
 
@@ -106,7 +129,9 @@ public partial class MainViewModel : ObservableObject
         if (IsConnected)
         {
             ConnectionStatus = "Disconnecting…";
-            await _simulatorConnection.SetDriftCorrectionEnabledAsync(false);
+            await _simulatorConnection.SetDriftCorrectionEnabledAsync(
+                false,
+                TimeSpan.FromMinutes(SelectedDriftInterval.Minutes));
             await _simulatorConnection.DisconnectAsync();
             IsConnected = false;
             ConnectionAction = "Connect";
@@ -118,7 +143,9 @@ public partial class MainViewModel : ObservableObject
         IsConnected = await _simulatorConnection.ConnectAsync();
         if (IsConnected && CorrectDrift)
         {
-            await _simulatorConnection.SetDriftCorrectionEnabledAsync(true);
+            await _simulatorConnection.SetDriftCorrectionEnabledAsync(
+                true,
+                TimeSpan.FromMinutes(SelectedDriftInterval.Minutes));
         }
         ConnectionAction = IsConnected ? "Disconnect" : "Connect";
         ConnectionStatus = IsConnected
@@ -138,7 +165,11 @@ public partial class MainViewModel : ObservableObject
         try
         {
             var pilotId = SimBriefPilotId.Trim();
-            await _settingsService.SaveAsync(new AppSettings(pilotId, SelectedTheme, SelectedAircraft));
+            await _settingsService.SaveAsync(new AppSettings(
+                pilotId,
+                SelectedTheme,
+                SelectedAircraft,
+                SelectedDriftInterval.Minutes));
             var route = await _routeProvider.GetLatestRouteAsync(pilotId);
             PopulateFlightPlan(route);
             ResyncSlots(0, 1);
@@ -188,7 +219,6 @@ public partial class MainViewModel : ObservableObject
         var routeIndex = FlightPlan.IndexOf(SelectedFlightPlanLeg);
         try
         {
-            if (CorrectDrift) await _simulatorConnection.ResetDriftAsync();
             if (AutoManageWaypoints) await ResyncSlotsAsync(routeIndex, SelectedInsSlot);
             else
             {
@@ -233,7 +263,6 @@ public partial class MainViewModel : ObservableObject
 
         try
         {
-            if (CorrectDrift) await _simulatorConnection.ResetDriftAsync();
             if (AutoManageWaypoints) await ResyncSlotsAsync(routeIndex, targetSlot);
             else
             {
@@ -319,3 +348,5 @@ public partial class MainViewModel : ObservableObject
         Accuracy = "—";
     }
 }
+
+public sealed record DriftIntervalOption(string Label, int Minutes);

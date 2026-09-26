@@ -33,6 +33,9 @@ public sealed class MockSimulatorConnection : ISimulatorConnection
 
     public Task ResetDriftAsync(CancellationToken cancellationToken = default) => Task.CompletedTask;
 
-    public Task SetDriftCorrectionEnabledAsync(bool enabled, CancellationToken cancellationToken = default) =>
+    public Task SetDriftCorrectionEnabledAsync(
+        bool enabled,
+        TimeSpan interval,
+        CancellationToken cancellationToken = default) =>
         Task.CompletedTask;
 }

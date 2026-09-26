@@ -4,7 +4,7 @@ A Windows desktop utility for managing classic inertial navigation systems in Mi
 
 ## Status
 
-The application currently supports the FlightSim Studio Boeing 727 in Microsoft Flight Simulator 2024. It downloads real flight plans from SimBrief, writes waypoint coordinates directly to the aircraft CIVA slots, supports direct-to selection, and can continuously correct INS position drift.
+The application currently supports the FlightSim Studio Boeing 727 in Microsoft Flight Simulator 2024. It downloads real flight plans from SimBrief, writes waypoint coordinates directly to the aircraft CIVA slots, supports direct-to selection, and can correct INS position drift at a configurable 10-minute, 30-minute, or one-hour interval.
 
 ## Architecture
 

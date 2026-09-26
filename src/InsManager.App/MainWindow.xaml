@@ -177,7 +177,8 @@
                 <Grid.RowDefinitions>
                     <RowDefinition Height="36" /><RowDefinition Height="24" /><RowDefinition Height="Auto" />
                     <RowDefinition Height="22" /><RowDefinition Height="Auto" /><RowDefinition Height="22" />
-                    <RowDefinition Height="Auto" /><RowDefinition Height="*" /><RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" /><RowDefinition Height="22" /><RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" /><RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
                 <Grid>
                     <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
@@ -196,7 +197,11 @@
                     <TextBlock Foreground="{DynamicResource SecondaryTextBrush}" Text="Theme" />
                     <ComboBox Margin="0,7,0,0" Padding="8" ItemsSource="{Binding Themes}" SelectedItem="{Binding SelectedTheme}" />
                 </StackPanel>
-                <Button Grid.Row="8" HorizontalAlignment="Right" Command="{Binding SaveSettingsCommand}" Content="Save" />
+                <StackPanel Grid.Row="8">
+                    <TextBlock Foreground="{DynamicResource SecondaryTextBrush}" Text="Drift correction interval" />
+                    <ComboBox Margin="0,7,0,0" Padding="8" DisplayMemberPath="Label" ItemsSource="{Binding DriftIntervals}" SelectedItem="{Binding SelectedDriftInterval}" />
+                </StackPanel>
+                <Button Grid.Row="10" HorizontalAlignment="Right" Command="{Binding SaveSettingsCommand}" Content="Save" />
             </Grid>
         </Border>
 

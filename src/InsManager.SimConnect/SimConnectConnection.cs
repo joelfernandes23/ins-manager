@@ -147,19 +147,23 @@ public sealed class SimConnectConnection : ISimulatorConnection, IAsyncDisposabl
 
     public async Task SetDriftCorrectionEnabledAsync(
         bool enabled,
+        TimeSpan interval,
         CancellationToken cancellationToken = default)
     {
         await StopDriftCorrectionAsync();
         if (!enabled) return;
 
+        if (interval < TimeSpan.FromMinutes(1))
+            throw new ArgumentOutOfRangeException(nameof(interval), "Drift correction interval must be at least one minute.");
+
         GetConnectedClient();
         _driftCorrectionCancellation = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
-        _driftCorrectionLoop = CorrectDriftAsync(_driftCorrectionCancellation.Token);
+        _driftCorrectionLoop = CorrectDriftAsync(interval, _driftCorrectionCancellation.Token);
     }
 
-    private async Task CorrectDriftAsync(CancellationToken cancellationToken)
+    private async Task CorrectDriftAsync(TimeSpan interval, CancellationToken cancellationToken)
     {
-        using var timer = new PeriodicTimer(TimeSpan.FromSeconds(5));
+        using var timer = new PeriodicTimer(interval);
         try
         {
             do
