@@ -17,6 +17,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InsManager.Core", "src\InsM
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InsManager.Infrastructure", "src\InsManager.Infrastructure\InsManager.Infrastructure.csproj", "{DFE3A621-5759-4983-AD2D-9C2340759AF0}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InsManager.Diagnostics", "src\InsManager.Diagnostics\InsManager.Diagnostics.csproj", "{A7F498DB-DFCE-48C2-88C2-D6BA24ECEF38}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -46,6 +48,10 @@ Global
 		{DFE3A621-5759-4983-AD2D-9C2340759AF0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DFE3A621-5759-4983-AD2D-9C2340759AF0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DFE3A621-5759-4983-AD2D-9C2340759AF0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A7F498DB-DFCE-48C2-88C2-D6BA24ECEF38}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A7F498DB-DFCE-48C2-88C2-D6BA24ECEF38}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A7F498DB-DFCE-48C2-88C2-D6BA24ECEF38}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A7F498DB-DFCE-48C2-88C2-D6BA24ECEF38}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{39E6F0A1-BA3F-43D5-AAAE-0906CF23D236} = {4DD796A1-FE7B-464C-9BE0-BDBEDF6F2F4C}
@@ -53,5 +59,6 @@ Global
 		{FFF3EC55-5A06-4F54-9354-96C1F4C26BD6} = {4DD796A1-FE7B-464C-9BE0-BDBEDF6F2F4C}
 		{776FD6C2-A4DD-4805-A158-0C8FB14AFC97} = {4DD796A1-FE7B-464C-9BE0-BDBEDF6F2F4C}
 		{DFE3A621-5759-4983-AD2D-9C2340759AF0} = {4DD796A1-FE7B-464C-9BE0-BDBEDF6F2F4C}
+		{A7F498DB-DFCE-48C2-88C2-D6BA24ECEF38} = {4DD796A1-FE7B-464C-9BE0-BDBEDF6F2F4C}
 	EndGlobalSection
 EndGlobal

@@ -6,6 +6,7 @@ bin/
 obj/
 TestResults/
 artifacts/
+input-events.json
 *.user
 *.suo
 *.nupkg

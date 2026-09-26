@@ -1,6 +1,6 @@
 param(
     [Parameter(Position = 0)]
-    [ValidateSet('setup', 'run', 'build', 'test', 'format', 'check')]
+    [ValidateSet('setup', 'run', 'scan', 'build', 'test', 'format', 'check')]
     [string]$Task = 'run'
 )
 
@@ -10,6 +10,7 @@ $localDotnet = Join-Path (Split-Path -Parent $repoRoot) '.dotnet\dotnet.exe'
 $dotnet = if (Test-Path $localDotnet) { $localDotnet } else { 'dotnet' }
 $solution = Join-Path $repoRoot 'InsManager.sln'
 $app = Join-Path $repoRoot 'src\InsManager.App\InsManager.App.csproj'
+$diagnostics = Join-Path $repoRoot 'src\InsManager.Diagnostics\InsManager.Diagnostics.csproj'
 
 function Invoke-DotNet {
     & $dotnet @args
@@ -25,6 +26,9 @@ switch ($Task) {
     }
     'run' {
         Invoke-DotNet run --project $app
+    }
+    'scan' {
+        Invoke-DotNet run --project $diagnostics -- @args
     }
     'build' {
         Invoke-DotNet build $solution --configuration Release
