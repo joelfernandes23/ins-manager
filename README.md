@@ -42,7 +42,7 @@ Common development commands:
 
 ## Releases
 
-Release packages are built only by GitHub Actions from the `release` branch. The workflow creates a self-contained Windows x64 ZIP and SHA-256 checksum. End users do not need to install .NET and should run `INSManager.exe`; this is a desktop utility, not a Community-folder package.
+Release packages are built only by GitHub Actions from the `release` branch. Each push to `release` creates a downloadable candidate artifact. The Release workflow creates the permanent self-contained Windows x64 ZIP and SHA-256 checksum. End users do not need to install .NET and should run `INSManager.exe`; this is a desktop utility, not a Community-folder package.
 
 A manual Release workflow run produces downloadable workflow artifacts without publishing a GitHub Release.
 
