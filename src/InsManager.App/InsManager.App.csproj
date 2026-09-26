@@ -11,6 +11,7 @@
     <Description>Classic INS route manager for Microsoft Flight Simulator 2024</Description>
     <Authors>Joel Fernandes</Authors>
     <RepositoryUrl>https://github.com/joelfernandes23/ins-manager</RepositoryUrl>
+    <ApplicationIcon>Assets\ins.ico</ApplicationIcon>
   </PropertyGroup>
 
   <ItemGroup>
@@ -22,6 +23,10 @@
     <ProjectReference Include="..\InsManager.Core\InsManager.Core.csproj" />
     <ProjectReference Include="..\InsManager.Infrastructure\InsManager.Infrastructure.csproj" />
     <ProjectReference Include="..\InsManager.SimConnect\InsManager.SimConnect.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Assets\ins.ico" />
   </ItemGroup>
 
 </Project>
