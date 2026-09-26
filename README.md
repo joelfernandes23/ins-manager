@@ -25,7 +25,7 @@ The release package includes the .NET runtime. There is no separate runtime to i
 
 ## Install and run
 
-1. Download the Windows ZIP from the latest GitHub Release.
+1. Download the Windows ZIP from the [latest GitHub Release](https://github.com/joelfernandes23/ins-manager/releases/latest).
 2. Extract the ZIP to a normal folder.
 3. Run `INSManager.exe`.
 4. Open Settings, enter your SimBrief Pilot ID, and save.
@@ -34,11 +34,21 @@ The release package includes the .NET runtime. There is no separate runtime to i
 
 Settings are stored for the current Windows user.
 
+Windows may show a SmartScreen warning because the executable is not currently signed with a commercial code-signing certificate. The release includes a SHA-256 checksum for anyone inclined to check the arithmetic.
+
 ## MSFS 2020
 
 MSFS 2020 connections are allowed on an experimental basis. The application will identify them as experimental, but it will not prevent waypoint, direct-to, or drift-correction commands from being sent.
 
 MSFS 2020 is not an officially supported platform. The current adapter was developed and tested against MSFS 2024 and the FSS 727. Reports from 2020 users are welcome, especially when accompanied by the aircraft version and a useful description of what went wrong.
+
+## Privacy
+
+INS Manager does not include telemetry or analytics. It stores its settings in the current Windows user's local application data folder. When a flight plan is requested, the configured Pilot ID is sent to the SimBrief API.
+
+## Support
+
+Use [GitHub Issues](https://github.com/joelfernandes23/ins-manager/issues) for bugs and compatibility reports. Include the simulator version, FSS 727 version, the action you attempted, and the full error message. Reports that merely say it broke will be admired for their economy and little else.
 
 ## Development
 
@@ -92,5 +102,3 @@ The write tests restore the values they change. The full MSFS SDK is optional an
 The project uses Conventional Commits and Release Please. A push to `main` updates the release pull request. Merging that pull request creates the version tag, changelog, and GitHub Release.
 
 The Windows package is built only by GitHub Actions. The workflow tests the tagged source, creates a self-contained x64 ZIP, calculates its SHA-256 checksum, and attaches both files to the release.
-
-The first automated release is pinned to `v1.0.0`. After that release, remove the one-time `release-as` entry from `release-please-config.json` and let Conventional Commits determine subsequent versions.
