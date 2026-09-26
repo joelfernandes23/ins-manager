@@ -4,5 +4,5 @@ namespace InsManager.Core.Services;
 
 public interface IRouteProvider
 {
-    Task<IReadOnlyList<Waypoint>> GetLatestRouteAsync(CancellationToken cancellationToken = default);
+    Task<IReadOnlyList<Waypoint>> GetLatestRouteAsync(string pilotId, CancellationToken cancellationToken = default);
 }

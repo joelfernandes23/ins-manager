@@ -15,6 +15,6 @@ public sealed class MockRouteProvider : IRouteProvider
         new("KRH", 49.0239, 8.5842), new("LBU", 48.9122, 9.3406),
     ];
 
-    public Task<IReadOnlyList<Waypoint>> GetLatestRouteAsync(CancellationToken cancellationToken = default) =>
+    public Task<IReadOnlyList<Waypoint>> GetLatestRouteAsync(string pilotId, CancellationToken cancellationToken = default) =>
         Task.FromResult<IReadOnlyList<Waypoint>>(Route);
 }

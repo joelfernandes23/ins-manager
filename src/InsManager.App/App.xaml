@@ -3,6 +3,15 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="clr-namespace:InsManager.App">
     <Application.Resources>
-
+        <SolidColorBrush x:Key="WindowBackgroundBrush" Color="#0B1014" />
+        <SolidColorBrush x:Key="PanelBackgroundBrush" Color="#121A20" />
+        <SolidColorBrush x:Key="InsetBackgroundBrush" Color="#0B1014" />
+        <SolidColorBrush x:Key="PrimaryTextBrush" Color="#E8EEF2" />
+        <SolidColorBrush x:Key="SecondaryTextBrush" Color="#8FA0AA" />
+        <SolidColorBrush x:Key="MutedTextBrush" Color="#67737A" />
+        <SolidColorBrush x:Key="BorderBrush" Color="#25313A" />
+        <SolidColorBrush x:Key="StatusBackgroundBrush" Color="#172127" />
+        <SolidColorBrush x:Key="AccentBrush" Color="#D98B34" />
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
     </Application.Resources>
 </Application>

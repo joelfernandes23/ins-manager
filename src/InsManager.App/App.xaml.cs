@@ -1,5 +1,7 @@
+using System.Net.Http;
 using System.Windows;
 using InsManager.App.ViewModels;
+using InsManager.App.Services;
 using InsManager.Core.Services;
 using InsManager.Infrastructure;
 using InsManager.SimConnect;
@@ -13,8 +15,11 @@ public partial class App : Application
     private readonly IHost _host = Host.CreateDefaultBuilder()
         .ConfigureServices(services =>
         {
-            services.AddSingleton<IRouteProvider, MockRouteProvider>();
+            services.AddSingleton(new HttpClient { Timeout = TimeSpan.FromSeconds(20) });
+            services.AddSingleton<IRouteProvider, SimBriefRouteProvider>();
+            services.AddSingleton<ISettingsService, JsonSettingsService>();
             services.AddSingleton<ISimulatorConnection, MockSimulatorConnection>();
+            services.AddSingleton<ThemeService>();
             services.AddSingleton<MainViewModel>();
             services.AddSingleton<MainWindow>();
         })
@@ -23,6 +28,7 @@ public partial class App : Application
     protected override async void OnStartup(StartupEventArgs e)
     {
         await _host.StartAsync();
+        await _host.Services.GetRequiredService<MainViewModel>().InitializeAsync();
         _host.Services.GetRequiredService<MainWindow>().Show();
         base.OnStartup(e);
     }

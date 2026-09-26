@@ -6,7 +6,7 @@ A Windows desktop utility for managing the FlightSim Studio Boeing 727 CIVA INS 
 
 Initial UI and development environment scaffold. Simulator integration is not implemented yet.
 
-The current application runs in mock mode: it can simulate a connection and load a sample route into the ten-slot INS display without sending commands to MSFS.
+The application currently keeps simulator control in mock mode, but downloads real flight plans from SimBrief. Open Settings to save your numeric SimBrief Pilot ID and choose a dark or light theme, then use the download button to load the latest route into the ten-slot INS display.
 
 ## Architecture
 
