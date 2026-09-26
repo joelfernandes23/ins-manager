@@ -50,4 +50,6 @@ Run `.\dev.ps1 scan` with the aircraft loaded to export matching CIVA/INS input 
 
 Use `.\dev.ps1 scan --civa-state` for a read-only dump of the live CIVA position and waypoint slots. `.\dev.ps1 scan --write-self-test` temporarily verifies slot 9 and restores its original values.
 
+Use `.\dev.ps1 scan --input-details INS` to inspect the loaded aircraft's INS input events. `.\dev.ps1 scan --input-write-self-test` safely verifies selector writes by retaining their existing values.
+
 The full Microsoft Flight Simulator SDK is optional for building this project. Install it from **MSFS 2024 DevMode → Help → SDK Installer** when the SimConnect Inspector or official samples are needed.

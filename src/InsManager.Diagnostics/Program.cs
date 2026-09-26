@@ -5,11 +5,21 @@ using SimConnect.NET.InputEvents;
 const string outputFileName = "input-events.json";
 var showCivaState = args.Contains("--civa-state", StringComparer.OrdinalIgnoreCase);
 var runWriteSelfTest = args.Contains("--write-self-test", StringComparer.OrdinalIgnoreCase);
-var filters = args.Length == 0 || showCivaState || runWriteSelfTest
+var runInputWriteSelfTest = args.Contains("--input-write-self-test", StringComparer.OrdinalIgnoreCase);
+var inputDetailsIndex = Array.FindIndex(args, argument =>
+    argument.Equals("--input-details", StringComparison.OrdinalIgnoreCase));
+var showInputDetails = inputDetailsIndex >= 0;
+var inputDetailsFilter = showInputDetails && inputDetailsIndex + 1 < args.Length
+    ? args[inputDetailsIndex + 1]
+    : "INS";
+var filters = showInputDetails
+    ? [inputDetailsFilter]
+    : args.Length == 0 || showCivaState || runWriteSelfTest || runInputWriteSelfTest
     ? ["CIVA", "INS", "CDU", "WAYPOINT", "WYPT"]
     : args;
 
-using var cancellation = new CancellationTokenSource(TimeSpan.FromSeconds(30));
+using var cancellation = new CancellationTokenSource(
+    showInputDetails ? TimeSpan.FromSeconds(120) : TimeSpan.FromSeconds(30));
 Console.CancelKeyPress += (_, eventArgs) =>
 {
     eventArgs.Cancel = true;
@@ -38,6 +48,12 @@ try
         return 0;
     }
 
+    if (runInputWriteSelfTest)
+    {
+        await RunInputWriteSelfTestAsync(client, cancellation.Token);
+        return 0;
+    }
+
     Console.WriteLine("Connected. Enumerating input events...");
     var events = await PumpUntilCompleteAsync(
         client,
@@ -60,6 +76,19 @@ try
     foreach (var inputEvent in matches)
     {
         Console.WriteLine($"{inputEvent.Name,-40} 0x{inputEvent.Hash:X16} {inputEvent.Type,-12} {inputEvent.NodeNames}");
+        if (showInputDetails)
+        {
+            var parameters = await TryReadAsync(
+                client,
+                token => client.InputEvents.EnumerateInputEventParametersAsync(inputEvent.Hash, token),
+                cancellation.Token);
+            var value = await TryReadAsync(
+                client,
+                async token => (await client.InputEvents.GetInputEventAsync(inputEvent.Hash, token)).ToString(),
+                cancellation.Token);
+            Console.WriteLine($"  Parameters: {parameters}");
+            Console.WriteLine($"  Value:      {value}");
+        }
     }
 
     var outputPath = Path.GetFullPath(outputFileName);
@@ -72,7 +101,7 @@ try
 }
 catch (OperationCanceledException)
 {
-    Console.Error.WriteLine("The scan timed out. Keep MSFS 2024 running with the FSS 727 loaded, then try again.");
+    Console.Error.WriteLine("The scan timed out. Keep MSFS 2024 running with the target aircraft loaded, then try again.");
     return 1;
 }
 catch (Exception exception)
@@ -97,6 +126,30 @@ static async Task<T> PumpUntilCompleteAsync<T>(
     }
 
     return await operation;
+}
+
+static async Task<string> TryReadAsync(
+    SimConnectClient client,
+    Func<CancellationToken, Task<string>> operationFactory,
+    CancellationToken cancellationToken)
+{
+    using var requestCancellation = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+    requestCancellation.CancelAfter(TimeSpan.FromSeconds(2));
+    try
+    {
+        return await PumpUntilCompleteAsync(
+            client,
+            operationFactory(requestCancellation.Token),
+            requestCancellation.Token);
+    }
+    catch (OperationCanceledException) when (!cancellationToken.IsCancellationRequested)
+    {
+        return "Unavailable (request timed out)";
+    }
+    catch (Exception exception) when (exception is SimConnectException or InvalidOperationException)
+    {
+        return $"Unavailable ({exception.Message})";
+    }
 }
 
 static async Task PrintCivaStateAsync(SimConnectClient client, CancellationToken cancellationToken)
@@ -162,6 +215,36 @@ static async Task RunWriteSelfTestAsync(SimConnectClient client, CancellationTok
         await WriteAsync(latitudeVariable, originalLatitude);
         await WriteAsync(longitudeVariable, originalLongitude);
         Console.WriteLine("INS slot 9 restored to its original values.");
+    }
+}
+
+static async Task RunInputWriteSelfTestAsync(SimConnectClient client, CancellationToken cancellationToken)
+{
+    var events = await PumpUntilCompleteAsync(
+        client,
+        client.InputEvents.EnumerateInputEventsAsync(cancellationToken),
+        cancellationToken);
+    var testNames = new[] { "INS_DATA_SELECTOR_1", "INS_OPERATING_MODE_1", "INS_THUMBWHEEL_1" };
+
+    foreach (var name in testNames)
+    {
+        var descriptor = events.Single(inputEvent => inputEvent.Name.Equals(name, StringComparison.Ordinal));
+        var before = await PumpUntilCompleteAsync(
+            client,
+            client.InputEvents.GetInputEventAsync(descriptor.Hash, cancellationToken),
+            cancellationToken);
+        if (!before.TryGetDoubleValue(out var value))
+            throw new InvalidOperationException($"{name} did not return a numeric value.");
+
+        await client.InputEvents.SetInputEventAsync(descriptor.Hash, value, cancellationToken);
+        var after = await PumpUntilCompleteAsync(
+            client,
+            client.InputEvents.GetInputEventAsync(descriptor.Hash, cancellationToken),
+            cancellationToken);
+        if (!after.TryGetDoubleValue(out var confirmed) || Math.Abs(confirmed - value) > 0.000001)
+            throw new InvalidOperationException($"{name} did not retain its existing value.");
+
+        Console.WriteLine($"{name}: write/read passed at {confirmed}.");
     }
 }
 
