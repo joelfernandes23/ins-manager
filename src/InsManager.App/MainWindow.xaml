@@ -126,29 +126,31 @@
             </Border>
 
             <Border Grid.Row="6" Style="{StaticResource Panel}" Padding="0">
-                <Grid>
-                    <Grid.RowDefinitions><RowDefinition Height="36" /><RowDefinition Height="*" /></Grid.RowDefinitions>
-                    <Border Padding="14,0" Background="{DynamicResource InsetBackgroundBrush}" CornerRadius="7,7,0,0">
-                        <Grid>
-                            <Grid.ColumnDefinitions><ColumnDefinition Width="55" /><ColumnDefinition Width="*" /><ColumnDefinition Width="120" /></Grid.ColumnDefinitions>
-                            <TextBlock VerticalAlignment="Center" Foreground="{DynamicResource MutedTextBrush}" Text="SLOT" />
-                            <TextBlock Grid.Column="1" VerticalAlignment="Center" Foreground="{DynamicResource MutedTextBrush}" Text="WAYPOINT" />
-                            <TextBlock Grid.Column="2" VerticalAlignment="Center" Foreground="{DynamicResource MutedTextBrush}" Text="STATE" />
-                        </Grid>
-                    </Border>
-                    <ListView Grid.Row="1" ItemsSource="{Binding Slots}" Background="Transparent" BorderThickness="0" Foreground="{DynamicResource PrimaryTextBrush}" ScrollViewer.VerticalScrollBarVisibility="Disabled">
-                        <ListView.ItemTemplate>
-                            <DataTemplate>
-                                <Grid Margin="10,3">
-                                    <Grid.ColumnDefinitions><ColumnDefinition Width="45" /><ColumnDefinition Width="*" /><ColumnDefinition Width="120" /></Grid.ColumnDefinitions>
-                                    <TextBlock FontFamily="Consolas" Text="{Binding Number}" />
-                                    <TextBlock Grid.Column="1" FontFamily="Consolas" Text="{Binding Waypoint.Identifier, TargetNullValue=—}" />
-                                    <TextBlock Grid.Column="2" Foreground="{DynamicResource SecondaryTextBrush}" Text="{Binding State}" />
-                                </Grid>
-                            </DataTemplate>
-                        </ListView.ItemTemplate>
-                    </ListView>
-                </Grid>
+                <ListView ItemsSource="{Binding FlightPlan}" Background="Transparent" BorderThickness="0" Foreground="{DynamicResource PrimaryTextBrush}" ScrollViewer.VerticalScrollBarVisibility="Auto">
+                    <ListView.View>
+                        <GridView AllowsColumnReorder="False">
+                            <GridViewColumn Header="NO." Width="42" DisplayMemberBinding="{Binding Number}" />
+                            <GridViewColumn Header="WPT" Width="82" DisplayMemberBinding="{Binding Waypoint.Identifier}" />
+                            <GridViewColumn Header="CO-ORDINATES" Width="176" DisplayMemberBinding="{Binding Coordinates}" />
+                            <GridViewColumn Header="TRACK" Width="66" DisplayMemberBinding="{Binding Track}" />
+                            <GridViewColumn Header="DIST." Width="78" DisplayMemberBinding="{Binding Distance}" />
+                            <GridViewColumn Header="ACTION" Width="190">
+                                <GridViewColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <StackPanel Orientation="Horizontal">
+                                            <Button Margin="0,2,6,2" Padding="10,4" Content="Send"
+                                                    Command="{Binding DataContext.OpenSendDialogCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                    CommandParameter="{Binding}" />
+                                            <Button Margin="0,2" Padding="10,4" Content="DCT"
+                                                    Command="{Binding DataContext.OpenDirectDialogCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                    CommandParameter="{Binding}" />
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </GridViewColumn.CellTemplate>
+                            </GridViewColumn>
+                        </GridView>
+                    </ListView.View>
+                </ListView>
             </Border>
         </Grid>
 
@@ -180,6 +182,34 @@
                 </StackPanel>
                 <Button Grid.Row="8" HorizontalAlignment="Right" Command="{Binding SaveSettingsCommand}" Content="Save" />
             </Grid>
+        </Border>
+
+        <Border Background="#88000000" Visibility="{Binding IsSendDialogOpen, Converter={StaticResource BooleanToVisibilityConverter}}" />
+        <Border Width="310" Padding="22" HorizontalAlignment="Center" VerticalAlignment="Center" Style="{StaticResource Panel}"
+                Visibility="{Binding IsSendDialogOpen, Converter={StaticResource BooleanToVisibilityConverter}}">
+            <StackPanel>
+                <TextBlock FontSize="18" FontWeight="SemiBold" Text="Send waypoint" />
+                <TextBlock Margin="0,8,0,16" FontFamily="Consolas" FontSize="16" Foreground="#F2A84B" Text="{Binding SelectedFlightPlanLeg.Waypoint.Identifier}" />
+                <TextBlock Foreground="{DynamicResource SecondaryTextBrush}" Text="INS slot" />
+                <ComboBox Margin="0,7,0,18" Padding="8" ItemsSource="{Binding InsSlotNumbers}" SelectedItem="{Binding SelectedInsSlot}" />
+                <StackPanel HorizontalAlignment="Right" Orientation="Horizontal">
+                    <Button Margin="0,0,8,0" Background="{DynamicResource StatusBackgroundBrush}" Foreground="{DynamicResource PrimaryTextBrush}" Command="{Binding CancelSendCommand}" Content="Cancel" />
+                    <Button Command="{Binding ConfirmSendCommand}" Content="Send" />
+                </StackPanel>
+            </StackPanel>
+        </Border>
+
+        <Border Background="#88000000" Visibility="{Binding IsDirectDialogOpen, Converter={StaticResource BooleanToVisibilityConverter}}" />
+        <Border Width="330" Padding="22" HorizontalAlignment="Center" VerticalAlignment="Center" Style="{StaticResource Panel}"
+                Visibility="{Binding IsDirectDialogOpen, Converter={StaticResource BooleanToVisibilityConverter}}">
+            <StackPanel>
+                <TextBlock FontSize="18" FontWeight="SemiBold" Text="Direct to waypoint?" />
+                <TextBlock Margin="0,10,0,20" FontFamily="Consolas" FontSize="20" Foreground="#F2A84B" Text="{Binding SelectedFlightPlanLeg.Waypoint.Identifier}" />
+                <StackPanel HorizontalAlignment="Right" Orientation="Horizontal">
+                    <Button Margin="0,0,8,0" Background="{DynamicResource StatusBackgroundBrush}" Foreground="{DynamicResource PrimaryTextBrush}" Command="{Binding CancelDirectCommand}" Content="No" />
+                    <Button Command="{Binding ConfirmDirectCommand}" Content="Yes" />
+                </StackPanel>
+            </StackPanel>
         </Border>
     </Grid>
 </Window>

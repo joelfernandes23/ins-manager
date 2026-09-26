@@ -13,7 +13,7 @@ public sealed class SimBriefRouteProviderTests
             {
               "navlog": {
                 "fix": [
-                  { "ident": "LAM", "pos_lat": "51.6462", "pos_long": "0.1558" },
+                  { "ident": "LAM", "pos_lat": "51.6462", "pos_long": "0.1558", "track_true": "123", "distance": "42.5" },
                   { "ident": "TOC", "pos_lat": "51.7000", "pos_long": "0.2000" },
                   { "ident": "KONAN", "pos_lat": 50.1469, "pos_long": 1.8667 }
                 ]
@@ -26,6 +26,8 @@ public sealed class SimBriefRouteProviderTests
 
         Assert.Equal(2, route.Count);
         Assert.Equal("LAM", route[0].Identifier);
+        Assert.Equal(123, route[0].TrackDegrees);
+        Assert.Equal(42.5, route[0].DistanceNauticalMiles);
         Assert.Equal(50.1469, route[1].Latitude, 4);
     }
 

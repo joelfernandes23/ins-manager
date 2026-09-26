@@ -31,6 +31,10 @@ public partial class MainViewModel : ObservableObject
     [ObservableProperty] private bool _isRouteLoaded;
     [ObservableProperty] private bool _isSettingsOpen;
     [ObservableProperty] private bool _isDownloading;
+    [ObservableProperty] private bool _isSendDialogOpen;
+    [ObservableProperty] private bool _isDirectDialogOpen;
+    [ObservableProperty] private int _selectedInsSlot = 1;
+    [ObservableProperty] private FlightPlanLeg? _selectedFlightPlanLeg;
 
     public MainViewModel(
         IRouteProvider routeProvider,
@@ -46,8 +50,10 @@ public partial class MainViewModel : ObservableObject
     }
 
     public ObservableCollection<InsSlot> Slots { get; } = [];
+    public ObservableCollection<FlightPlanLeg> FlightPlan { get; } = [];
     public IReadOnlyList<string> Themes { get; } = ["Dark", "Light"];
     public IReadOnlyList<string> SupportedAircraft { get; } = ["FSS Boeing 727"];
+    public IReadOnlyList<int> InsSlotNumbers { get; } = Enumerable.Range(1, 9).ToArray();
 
     public async Task InitializeAsync()
     {
@@ -97,7 +103,8 @@ public partial class MainViewModel : ObservableObject
             var pilotId = SimBriefPilotId.Trim();
             await _settingsService.SaveAsync(new AppSettings(pilotId, SelectedTheme, SelectedAircraft));
             var route = await _routeProvider.GetLatestRouteAsync(pilotId);
-            PopulateSlots(route);
+            PopulateFlightPlan(route);
+            ResyncSlots(0, 1);
             RouteStatus = $"Flight plan downloaded · {route.Count} waypoints";
             DownloadStatus = "Success";
             IsRouteLoaded = true;
@@ -121,24 +128,91 @@ public partial class MainViewModel : ObservableObject
         }
     }
 
-    private void PopulateSlots(IReadOnlyList<Waypoint> route)
+    [RelayCommand]
+    private void OpenSendDialog(FlightPlanLeg? leg)
     {
-        Slots.Clear();
-        for (var slot = 0; slot < 10; slot++)
-        {
-            var waypoint = slot < 9 && slot < route.Count ? route[slot] : null;
-            Slots.Add(new InsSlot(slot, waypoint, waypoint is null ? "Empty" : "Queued"));
-        }
+        if (leg is null) return;
+        SelectedFlightPlanLeg = leg;
+        SelectedInsSlot = 1;
+        IsSendDialogOpen = true;
+    }
+
+    [RelayCommand]
+    private void ConfirmSend()
+    {
+        if (SelectedFlightPlanLeg is null) return;
+
+        var routeIndex = FlightPlan.IndexOf(SelectedFlightPlanLeg);
+        if (AutoManageWaypoints) ResyncSlots(routeIndex, SelectedInsSlot);
+        else SetSlot(SelectedInsSlot, SelectedFlightPlanLeg.Waypoint, "Loaded");
+
+        RouteStatus = $"{SelectedFlightPlanLeg.Waypoint.Identifier} sent to INS slot {SelectedInsSlot}";
+        IsSendDialogOpen = false;
+    }
+
+    [RelayCommand]
+    private void CancelSend() => IsSendDialogOpen = false;
+
+    [RelayCommand]
+    private void OpenDirectDialog(FlightPlanLeg? leg)
+    {
+        if (leg is null) return;
+        SelectedFlightPlanLeg = leg;
+        IsDirectDialogOpen = true;
+    }
+
+    [RelayCommand]
+    private void ConfirmDirect()
+    {
+        if (SelectedFlightPlanLeg is null) return;
+
+        var loadedSlot = Slots.FirstOrDefault(slot => slot.Number > 0 && slot.Waypoint == SelectedFlightPlanLeg.Waypoint);
+        var targetSlot = loadedSlot?.Number ?? (int.TryParse(ToSlot, out var currentTo) && currentTo is >= 1 and <= 9 ? currentTo : 1);
+        var routeIndex = FlightPlan.IndexOf(SelectedFlightPlanLeg);
+
+        if (AutoManageWaypoints) ResyncSlots(routeIndex, targetSlot);
+        else SetSlot(targetSlot, SelectedFlightPlanLeg.Waypoint, "Direct");
 
         FromSlot = "0";
-        ToSlot = route.Count > 0 ? "1" : "—";
+        ToSlot = targetSlot.ToString();
         Accuracy = "1";
+        RouteStatus = $"Direct to {SelectedFlightPlanLeg.Waypoint.Identifier} via INS slot {targetSlot}";
+        IsDirectDialogOpen = false;
+    }
+
+    [RelayCommand]
+    private void CancelDirect() => IsDirectDialogOpen = false;
+
+    private void PopulateFlightPlan(IReadOnlyList<Waypoint> route)
+    {
+        FlightPlan.Clear();
+        foreach (var leg in RouteCalculator.BuildLegs(route)) FlightPlan.Add(leg);
+    }
+
+    private void ResyncSlots(int routeIndex, int startingSlot)
+    {
+        for (var offset = 0; offset < 9; offset++)
+        {
+            var slotNumber = ((startingSlot - 1 + offset) % 9) + 1;
+            var waypointIndex = routeIndex + offset;
+            var waypoint = waypointIndex < FlightPlan.Count ? FlightPlan[waypointIndex].Waypoint : null;
+            SetSlot(slotNumber, waypoint, waypoint is null ? "Empty" : "Synced");
+        }
+    }
+
+    private void SetSlot(int slotNumber, Waypoint? waypoint, string state)
+    {
+        Slots[slotNumber] = new InsSlot(slotNumber, waypoint, state);
     }
 
     private void ResetSlots()
     {
+        FlightPlan.Clear();
         Slots.Clear();
-        for (var slot = 0; slot < 10; slot++) Slots.Add(new InsSlot(slot, null, "Empty"));
+        for (var slot = 0; slot < 10; slot++)
+        {
+            Slots.Add(new InsSlot(slot, null, slot == 0 ? "Position" : "Empty"));
+        }
         FromSlot = "—";
         ToSlot = "—";
         Accuracy = "—";

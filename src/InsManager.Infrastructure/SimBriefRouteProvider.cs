@@ -46,7 +46,9 @@ public sealed class SimBriefRouteProvider(HttpClient httpClient) : IRouteProvide
             if (!TryGetDouble(fix, "pos_lat", out var latitude)
                 || !TryGetDouble(fix, "pos_long", out var longitude)) continue;
 
-            waypoints.Add(new Waypoint(identifier, latitude, longitude));
+            var track = GetFirstDouble(fix, "track_true", "track_mag", "track");
+            var distance = GetFirstDouble(fix, "distance");
+            waypoints.Add(new Waypoint(identifier, latitude, longitude, track, distance));
         }
 
         if (waypoints.Count == 0)
@@ -67,5 +69,15 @@ public sealed class SimBriefRouteProvider(HttpClient httpClient) : IRouteProvide
         return property.ValueKind == JsonValueKind.Number
             ? property.TryGetDouble(out value)
             : double.TryParse(property.GetString(), NumberStyles.Float, CultureInfo.InvariantCulture, out value);
+    }
+
+    private static double? GetFirstDouble(JsonElement element, params string[] names)
+    {
+        foreach (var name in names)
+        {
+            if (TryGetDouble(element, name, out var value)) return value;
+        }
+
+        return null;
     }
 }
