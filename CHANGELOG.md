@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.2](https://github.com/joelfernandes23/ins-manager/compare/v1.0.1...v1.0.2) (2026-09-26)
+
+
+### Bug Fixes
+
+* complete shutdown before process exit ([6c445fe](https://github.com/joelfernandes23/ins-manager/commit/6c445fe59255da908263560e1f316ab08b2bb95f))
+
 ## [1.0.1](https://github.com/joelfernandes23/ins-manager/compare/v1.0.0...v1.0.1) (2026-09-26)
 
 
