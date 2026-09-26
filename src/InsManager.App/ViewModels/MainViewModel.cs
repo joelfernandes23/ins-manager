@@ -99,7 +99,7 @@ public partial class MainViewModel : ObservableObject
         IsConnected = await _simulatorConnection.ConnectAsync();
         ConnectionAction = IsConnected ? "Disconnect" : "Connect";
         ConnectionStatus = IsConnected
-            ? $"MSFS 2024 connected · {_simulatorConnection.InputEventCount} controls"
+            ? "MSFS 2024 connected"
             : _simulatorConnection.LastError ?? "Connection failed";
     }
 

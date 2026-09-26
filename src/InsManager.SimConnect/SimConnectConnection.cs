@@ -1,4 +1,3 @@
-using System.Text.Json;
 using InsManager.Core.Services;
 using SimConnect.NET;
 using SimConnect.NET.Events;
@@ -41,7 +40,6 @@ public sealed class SimConnectConnection : ISimulatorConnection, IAsyncDisposabl
             _messageLoopCancellation = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
             _messageLoop = ProcessMessagesAsync(client, _messageLoopCancellation.Token);
 
-            await WriteInputEventReportAsync(client, cancellationToken);
             return true;
         }
         catch (Exception exception) when (exception is SimConnectException
@@ -56,35 +54,6 @@ public sealed class SimConnectConnection : ISimulatorConnection, IAsyncDisposabl
         {
             _connectionLock.Release();
         }
-    }
-
-    private async Task WriteInputEventReportAsync(
-        SimConnectClient client,
-        CancellationToken cancellationToken)
-    {
-        var events = await client.InputEvents.EnumerateInputEventsAsync(cancellationToken);
-        var report = events
-            .OrderBy(inputEvent => inputEvent.Name, StringComparer.OrdinalIgnoreCase)
-            .Select(inputEvent => new InputEventReportEntry(
-                inputEvent.Name,
-                inputEvent.Hash,
-                inputEvent.Type.ToString(),
-                inputEvent.NodeNames))
-            .ToArray();
-
-        var directory = Path.Combine(
-            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-            "INS Manager",
-            "diagnostics");
-        Directory.CreateDirectory(directory);
-        DiagnosticReportPath = Path.Combine(directory, "msfs2024-input-events.json");
-        await using var stream = File.Create(DiagnosticReportPath);
-        await JsonSerializer.SerializeAsync(
-            stream,
-            report,
-            new JsonSerializerOptions { WriteIndented = true },
-            cancellationToken);
-        InputEventCount = report.Length;
     }
 
     private static async Task ProcessMessagesAsync(
@@ -161,10 +130,4 @@ public sealed class SimConnectConnection : ISimulatorConnection, IAsyncDisposabl
         await DisconnectCoreAsync();
         _connectionLock.Dispose();
     }
-
-    private sealed record InputEventReportEntry(
-        string Name,
-        ulong Hash,
-        string Type,
-        string NodeNames);
 }
