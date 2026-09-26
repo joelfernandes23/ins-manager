@@ -3,7 +3,7 @@
   "packages": {
     ".": {
       "release-type": "simple",
-      "package-name": "INS Manager",
+      "package-name": "ins-manager",
       "include-component-in-tag": false,
       "include-v-in-tag": true,
       "release-as": "1.0.0"
