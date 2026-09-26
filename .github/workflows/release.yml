@@ -20,10 +20,10 @@ jobs:
 
     steps:
       - name: Check out repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Set up .NET
-        uses: actions/setup-dotnet@v4
+        uses: actions/setup-dotnet@v6
         with:
           global-json-file: global.json
           cache: true
@@ -51,7 +51,7 @@ jobs:
         run: .\dev.ps1 package ${{ steps.version.outputs.version }}
 
       - name: Upload workflow artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: INS-Manager-${{ steps.version.outputs.version }}-win-x64
           path: |
