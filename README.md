@@ -26,10 +26,17 @@ The current application runs in mock mode: it can simulate a connection and load
 
 ```powershell
 .\scripts\setup.ps1
-dotnet restore
-dotnet build
-dotnet test
-dotnet run --project .\src\InsManager.App
+.\dev.ps1 run
+```
+
+Common development commands:
+
+```powershell
+.\dev.ps1 setup
+.\dev.ps1 build
+.\dev.ps1 test
+.\dev.ps1 format
+.\dev.ps1 check
 ```
 
 The repository uses pre-commit for whitespace, YAML, merge-conflict, and .NET formatting checks. Tests run on the pre-push hook.
