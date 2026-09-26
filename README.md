@@ -6,6 +6,16 @@ A Windows desktop utility for managing the FlightSim Studio Boeing 727 CIVA INS 
 
 Initial UI and development environment scaffold. Simulator integration is not implemented yet.
 
+The current application runs in mock mode: it can simulate a connection and load a sample route into the ten-slot INS display without sending commands to MSFS.
+
+## Architecture
+
+- `InsManager.App` — WPF views, MVVM view models, and application composition
+- `InsManager.Core` — simulator-independent route and INS domain contracts
+- `InsManager.Infrastructure` — SimBrief, settings, and persistence adapters
+- `InsManager.SimConnect` — MSFS connectivity and aircraft-specific integration
+- `InsManager.Tests` — automated domain and adapter tests
+
 ## Prerequisites
 
 - Windows 10 or Windows 11

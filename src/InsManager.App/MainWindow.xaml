@@ -38,7 +38,7 @@
             <Border Grid.Column="1" Padding="14,8" Background="#172127" CornerRadius="18">
                 <StackPanel Orientation="Horizontal">
                     <Ellipse Width="9" Height="9" Margin="0,0,8,0" Fill="#67737A" />
-                    <TextBlock Foreground="#B7C2C8" Text="Simulator disconnected" />
+                    <TextBlock Foreground="#B7C2C8" Text="{Binding ConnectionStatus}" />
                 </StackPanel>
             </Border>
         </Grid>
@@ -54,14 +54,15 @@
                         <TextBlock Margin="0,7,0,16" FontSize="20" FontWeight="SemiBold" Text="SimBrief" />
                         <TextBlock Foreground="#8FA0AA" Text="Pilot ID" />
                         <TextBox Margin="0,7,0,16" Padding="11" Background="#0B1014" BorderBrush="#35434C" Foreground="White" Text="Not configured" />
-                        <Button HorizontalAlignment="Left" Content="Fetch latest flight" />
+                        <Button HorizontalAlignment="Left" Command="{Binding LoadRouteCommand}" Content="Load sample flight" />
+                        <TextBlock Margin="0,12,0,0" Foreground="#8FA0AA" Text="{Binding RouteStatus}" />
                     </StackPanel>
                 </Border>
                 <Border Margin="0,20,0,0" Style="{StaticResource Panel}">
                     <StackPanel>
                         <TextBlock FontSize="12" Foreground="#8FA0AA" Text="AUTOMATION" />
-                        <CheckBox Margin="0,16,0,0" Foreground="#E8EEF2" Content="Auto-manage waypoint slots" />
-                        <CheckBox Margin="0,13,0,0" Foreground="#E8EEF2" Content="Correct INS drift" />
+                        <CheckBox Margin="0,16,0,0" Foreground="#E8EEF2" Content="Auto-manage waypoint slots" IsChecked="{Binding AutoManageWaypoints}" />
+                        <CheckBox Margin="0,13,0,0" Foreground="#E8EEF2" Content="Correct INS drift" IsChecked="{Binding CorrectDrift}" />
                         <TextBlock Margin="0,18,0,5" Foreground="#8FA0AA" Text="Correction interval" />
                         <ComboBox Padding="8" SelectedIndex="1">
                             <ComboBoxItem Content="30 seconds" /><ComboBoxItem Content="60 seconds" /><ComboBoxItem Content="5 minutes" />
@@ -78,9 +79,9 @@
                     </Grid.RowDefinitions>
                     <TextBlock FontSize="12" Foreground="#8FA0AA" Text="INS STATUS" />
                     <UniformGrid Grid.Row="2" Columns="3">
-                        <StackPanel><TextBlock Foreground="#8FA0AA" Text="FROM" /><TextBlock Margin="0,5,0,0" FontFamily="Consolas" FontSize="31" Foreground="#F2A84B" Text="—" /></StackPanel>
-                        <StackPanel><TextBlock Foreground="#8FA0AA" Text="TO" /><TextBlock Margin="0,5,0,0" FontFamily="Consolas" FontSize="31" Foreground="#F2A84B" Text="—" /></StackPanel>
-                        <StackPanel><TextBlock Foreground="#8FA0AA" Text="ACCURACY" /><TextBlock Margin="0,5,0,0" FontFamily="Consolas" FontSize="31" Foreground="#F2A84B" Text="—" /></StackPanel>
+                        <StackPanel><TextBlock Foreground="#8FA0AA" Text="FROM" /><TextBlock Margin="0,5,0,0" FontFamily="Consolas" FontSize="31" Foreground="#F2A84B" Text="{Binding FromSlot}" /></StackPanel>
+                        <StackPanel><TextBlock Foreground="#8FA0AA" Text="TO" /><TextBlock Margin="0,5,0,0" FontFamily="Consolas" FontSize="31" Foreground="#F2A84B" Text="{Binding ToSlot}" /></StackPanel>
+                        <StackPanel><TextBlock Foreground="#8FA0AA" Text="ACCURACY" /><TextBlock Margin="0,5,0,0" FontFamily="Consolas" FontSize="31" Foreground="#F2A84B" Text="{Binding Accuracy}" /></StackPanel>
                     </UniformGrid>
                     <StackPanel Grid.Row="4">
                         <TextBlock Margin="0,0,0,12" FontSize="17" FontWeight="SemiBold" Text="Waypoint buffer" />
@@ -90,7 +91,18 @@
                                 <TextBlock Foreground="#75848D" Text="SLOT" /><TextBlock Grid.Column="1" Foreground="#75848D" Text="WAYPOINT" /><TextBlock Grid.Column="2" Foreground="#75848D" Text="STATE" />
                             </Grid>
                         </Border>
-                        <TextBlock Margin="0,42,0,0" HorizontalAlignment="Center" Foreground="#67737A" Text="Connect to MSFS and load a route to begin" />
+                        <ListView Margin="0,8,0,0" ItemsSource="{Binding Slots}" Background="Transparent" BorderThickness="0" Foreground="#D7E0E5">
+                            <ListView.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid Margin="8,5">
+                                        <Grid.ColumnDefinitions><ColumnDefinition Width="48" /><ColumnDefinition Width="*" /><ColumnDefinition Width="130" /></Grid.ColumnDefinitions>
+                                        <TextBlock FontFamily="Consolas" Text="{Binding Number}" />
+                                        <TextBlock Grid.Column="1" FontFamily="Consolas" Text="{Binding Waypoint.Identifier, TargetNullValue=—}" />
+                                        <TextBlock Grid.Column="2" Foreground="#8FA0AA" Text="{Binding State}" />
+                                    </Grid>
+                                </DataTemplate>
+                            </ListView.ItemTemplate>
+                        </ListView>
                     </StackPanel>
                 </Grid>
             </Border>
@@ -98,8 +110,8 @@
 
         <Grid Grid.Row="4">
             <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
-            <TextBlock VerticalAlignment="Center" Foreground="#67737A" Text="Prototype UI · no simulator commands are sent yet" />
-            <Button Grid.Column="1" IsEnabled="False" Content="Start automation" />
+            <TextBlock VerticalAlignment="Center" Foreground="#67737A" Text="Mock mode · no simulator commands are sent" />
+            <Button Grid.Column="1" Command="{Binding ConnectCommand}" Content="Connect mock simulator" />
         </Grid>
     </Grid>
 </Window>

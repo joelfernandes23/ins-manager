@@ -8,4 +8,15 @@
     <UseWPF>true</UseWPF>
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\InsManager.Core\InsManager.Core.csproj" />
+    <ProjectReference Include="..\InsManager.Infrastructure\InsManager.Infrastructure.csproj" />
+    <ProjectReference Include="..\InsManager.SimConnect\InsManager.SimConnect.csproj" />
+  </ItemGroup>
+
 </Project>
