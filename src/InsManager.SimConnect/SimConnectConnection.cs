@@ -66,8 +66,8 @@ public sealed class SimConnectConnection : ISimulatorConnection, IAsyncDisposabl
         {
             while (!cancellationToken.IsCancellationRequested && client.IsConnected)
             {
-                var processed = await client.ProcessNextMessageAsync(cancellationToken);
-                if (!processed) await Task.Delay(10, cancellationToken);
+                var processed = await client.ProcessNextMessageAsync(cancellationToken).ConfigureAwait(false);
+                if (!processed) await Task.Delay(10, cancellationToken).ConfigureAwait(false);
             }
         }
         catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
@@ -167,9 +167,9 @@ public sealed class SimConnectConnection : ISimulatorConnection, IAsyncDisposabl
         {
             do
             {
-                await ResetDriftAsync(cancellationToken);
+                await ResetDriftAsync(cancellationToken).ConfigureAwait(false);
             }
-            while (await timer.WaitForNextTickAsync(cancellationToken));
+            while (await timer.WaitForNextTickAsync(cancellationToken).ConfigureAwait(false));
         }
         catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
         {
@@ -183,7 +183,7 @@ public sealed class SimConnectConnection : ISimulatorConnection, IAsyncDisposabl
     private async Task StopDriftCorrectionAsync()
     {
         _driftCorrectionCancellation?.Cancel();
-        if (_driftCorrectionLoop is not null) await _driftCorrectionLoop;
+        if (_driftCorrectionLoop is not null) await _driftCorrectionLoop.ConfigureAwait(false);
         _driftCorrectionCancellation?.Dispose();
         _driftCorrectionCancellation = null;
         _driftCorrectionLoop = null;
@@ -196,13 +196,13 @@ public sealed class SimConnectConnection : ISimulatorConnection, IAsyncDisposabl
 
     private async Task DisconnectCoreAsync()
     {
-        await StopDriftCorrectionAsync();
+        await StopDriftCorrectionAsync().ConfigureAwait(false);
         _messageLoopCancellation?.Cancel();
         if (_messageLoop is not null)
         {
             try
             {
-                await _messageLoop;
+                await _messageLoop.ConfigureAwait(false);
             }
             catch (SimConnectException)
             {
@@ -217,14 +217,14 @@ public sealed class SimConnectConnection : ISimulatorConnection, IAsyncDisposabl
         {
             _client.ConnectionStatusChanged -= OnConnectionStatusChanged;
             _client.ErrorOccurred -= OnErrorOccurred;
-            await _client.DisposeAsync();
+            await _client.DisposeAsync().ConfigureAwait(false);
             _client = null;
         }
     }
 
     public async ValueTask DisposeAsync()
     {
-        await DisconnectCoreAsync();
+        await DisconnectCoreAsync().ConfigureAwait(false);
         _connectionLock.Dispose();
     }
 }
