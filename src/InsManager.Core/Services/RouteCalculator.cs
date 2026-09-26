@@ -22,8 +22,8 @@ public static class RouteCalculator
                 index + 1,
                 waypoint,
                 FormatCoordinates(waypoint),
-                track is null ? "—" : $"{track.Value:000}°",
-                distance is null ? "—" : $"{distance.Value:0.0} NM"));
+                track is null ? "-" : $"{track.Value:000}°",
+                distance is null ? "-" : $"{distance.Value:0.0} NM"));
         }
 
         return legs;

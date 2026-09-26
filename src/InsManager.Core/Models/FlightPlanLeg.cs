@@ -6,4 +6,4 @@ public sealed record FlightPlanLeg(
     string Coordinates,
     string Track,
     string Distance,
-    string InsSlot = "—");
+    string InsSlot = "-");

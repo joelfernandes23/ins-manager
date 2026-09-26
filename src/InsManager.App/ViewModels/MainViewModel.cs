@@ -20,9 +20,9 @@ public partial class MainViewModel : ObservableObject
     [ObservableProperty] private string _connectionAction = "Connect";
     [ObservableProperty] private string _routeStatus = "No flight plan downloaded";
     [ObservableProperty] private string _downloadStatus = "Idle";
-    [ObservableProperty] private string _fromSlot = "—";
-    [ObservableProperty] private string _toSlot = "—";
-    [ObservableProperty] private string _accuracy = "—";
+    [ObservableProperty] private string _fromSlot = "-";
+    [ObservableProperty] private string _toSlot = "-";
+    [ObservableProperty] private string _accuracy = "-";
     [ObservableProperty] private string _simBriefPilotId = "";
     [ObservableProperty] private string _selectedTheme = "Dark";
     [ObservableProperty] private string _selectedAircraft = "FSS Boeing 727";
@@ -330,7 +330,7 @@ public partial class MainViewModel : ObservableObject
                 .Where(slot => slot.Number > 0 && ReferenceEquals(slot.Waypoint, leg.Waypoint))
                 .Select(slot => slot.Number.ToString())
                 .ToArray();
-            var assignment = slots.Length == 0 ? "—" : string.Join(", ", slots);
+            var assignment = slots.Length == 0 ? "-" : string.Join(", ", slots);
             if (leg.InsSlot != assignment) FlightPlan[index] = leg with { InsSlot = assignment };
         }
     }
@@ -343,9 +343,9 @@ public partial class MainViewModel : ObservableObject
         {
             Slots.Add(new InsSlot(slot, null, slot == 0 ? "Position" : "Empty"));
         }
-        FromSlot = "—";
-        ToSlot = "—";
-        Accuracy = "—";
+        FromSlot = "-";
+        ToSlot = "-";
+        Accuracy = "-";
     }
 }
 
