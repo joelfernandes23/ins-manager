@@ -17,7 +17,7 @@ The first release officially supports the FlightSim Studio Boeing 727 in Microso
 ## Requirements
 
 - Windows 10 or Windows 11
-- Microsoft Flight Simulator 2024, or Microsoft Flight Simulator 2020 for experimental use
+- Microsoft Flight Simulator 2024
 - FlightSim Studio Boeing 727
 - A SimBrief account
 
@@ -35,12 +35,6 @@ The release package includes the .NET runtime. There is no separate runtime to i
 Settings are stored for the current Windows user.
 
 Windows may show a SmartScreen warning because the executable is not currently signed with a commercial code-signing certificate. The release includes a SHA-256 checksum for anyone inclined to check the arithmetic.
-
-## MSFS 2020
-
-MSFS 2020 connections are allowed on an experimental basis. The application will identify them as experimental, but it will not prevent waypoint, direct-to, or drift-correction commands from being sent.
-
-MSFS 2020 is not an officially supported platform. The current adapter was developed and tested against MSFS 2024 and the FSS 727. Reports from 2020 users are welcome, especially when accompanied by the aircraft version and a useful description of what went wrong.
 
 ## Privacy
 

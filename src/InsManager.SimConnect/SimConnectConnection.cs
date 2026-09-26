@@ -15,7 +15,6 @@ public sealed class SimConnectConnection : ISimulatorConnection, IAsyncDisposabl
     private Task? _driftCorrectionLoop;
 
     public bool IsConnected => _client?.IsConnected == true;
-    public bool IsMsfs2024 => _client?.IsMSFS2024 == true;
     public int InputEventCount { get; private set; }
     public string? DiagnosticReportPath { get; private set; }
     public string? LastError { get; private set; }
