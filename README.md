@@ -38,14 +38,13 @@ Common development commands:
 .\dev.ps1 scan
 .\dev.ps1 format
 .\dev.ps1 check
-.\dev.ps1 package 1.0.0
 ```
-
-The package command creates a self-contained Windows x64 ZIP and SHA-256 checksum in `artifacts\release`. End users do not need to install .NET and should run `INSManager.exe`; this is a desktop utility, not a Community-folder package.
 
 ## Releases
 
-Every push and pull request is formatted, built, tested, and packaged by GitHub Actions. A manual Release workflow run produces downloadable workflow artifacts without publishing a release.
+Release packages are built only by GitHub Actions from the `release` branch. The workflow creates a self-contained Windows x64 ZIP and SHA-256 checksum. End users do not need to install .NET and should run `INSManager.exe`; this is a desktop utility, not a Community-folder package.
+
+A manual Release workflow run produces downloadable workflow artifacts without publishing a GitHub Release.
 
 Pushing a semantic-version tag publishes the same package as a GitHub Release:
 

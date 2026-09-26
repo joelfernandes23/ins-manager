@@ -1,6 +1,6 @@
 param(
     [Parameter(Position = 0)]
-    [ValidateSet('setup', 'run', 'scan', 'build', 'test', 'format', 'check', 'package')]
+    [ValidateSet('setup', 'run', 'scan', 'build', 'test', 'format', 'check')]
     [string]$Task = 'run',
 
     [Parameter(ValueFromRemainingArguments)]
@@ -47,11 +47,5 @@ switch ($Task) {
         Invoke-DotNet format $solution --verify-no-changes --no-restore
         Invoke-DotNet build $solution --configuration Release --no-restore
         Invoke-DotNet test $solution --configuration Release --no-build
-    }
-    'package' {
-        & (Join-Path $repoRoot 'scripts\package.ps1') @Arguments
-        if ($LASTEXITCODE -ne 0) {
-            throw "package command failed with exit code $LASTEXITCODE"
-        }
     }
 }

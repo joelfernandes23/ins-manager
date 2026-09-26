@@ -38,17 +38,3 @@ jobs:
 
       - name: Test
         run: dotnet test InsManager.sln --configuration Release --no-build
-
-      - name: Package
-        shell: pwsh
-        run: .\dev.ps1 package 1.0.0-ci.${{ github.run_number }}
-
-      - name: Upload Windows package
-        uses: actions/upload-artifact@v7
-        with:
-          name: INS-Manager-win-x64
-          path: |
-            artifacts/release/*.zip
-            artifacts/release/*.sha256
-          if-no-files-found: error
-          retention-days: 14

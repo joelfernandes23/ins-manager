@@ -21,6 +21,8 @@ jobs:
     steps:
       - name: Check out repository
         uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
 
       - name: Set up .NET
         uses: actions/setup-dotnet@v6
@@ -40,6 +42,15 @@ jobs:
           }
           "version=$version" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
 
+      - name: Require release branch
+        shell: pwsh
+        run: |
+          git fetch origin release
+          git merge-base --is-ancestor $env:GITHUB_SHA origin/release
+          if ($LASTEXITCODE -ne 0) {
+            throw 'Release builds must come from the release branch.'
+          }
+
       - name: Restore
         run: dotnet restore InsManager.sln
 
@@ -48,7 +59,7 @@ jobs:
 
       - name: Package
         shell: pwsh
-        run: .\dev.ps1 package ${{ steps.version.outputs.version }}
+        run: .\scripts\package.ps1 ${{ steps.version.outputs.version }}
 
       - name: Upload workflow artifact
         uses: actions/upload-artifact@v7
