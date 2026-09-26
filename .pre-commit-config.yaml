@@ -1,0 +1,25 @@
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v6.0.0
+    hooks:
+      - id: check-merge-conflict
+      - id: check-yaml
+      - id: end-of-file-fixer
+      - id: mixed-line-ending
+        args: [--fix=crlf]
+      - id: trailing-whitespace
+
+  - repo: local
+    hooks:
+      - id: dotnet-format
+        name: dotnet format
+        entry: powershell.exe -NoProfile -ExecutionPolicy Bypass -File scripts/precommit.ps1 format
+        language: system
+        pass_filenames: false
+        files: ^.*\.(cs|csproj|props|targets|xaml)$
+      - id: dotnet-test
+        name: dotnet test
+        entry: powershell.exe -NoProfile -ExecutionPolicy Bypass -File scripts/precommit.ps1 test
+        language: system
+        pass_filenames: false
+        stages: [pre-push]
