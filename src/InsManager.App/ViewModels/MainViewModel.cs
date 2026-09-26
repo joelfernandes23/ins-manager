@@ -17,6 +17,7 @@ public partial class MainViewModel : ObservableObject
     private readonly ThemeService _themeService;
 
     [ObservableProperty] private string _connectionStatus = "Simulator disconnected";
+    [ObservableProperty] private string _connectionAction = "Connect";
     [ObservableProperty] private string _routeStatus = "No flight plan downloaded";
     [ObservableProperty] private string _downloadStatus = "Idle";
     [ObservableProperty] private string _fromSlot = "—";
@@ -82,10 +83,21 @@ public partial class MainViewModel : ObservableObject
     }
 
     [RelayCommand]
-    private async Task ConnectAsync()
+    private async Task ToggleConnectionAsync()
     {
+        if (IsConnected)
+        {
+            ConnectionStatus = "Disconnecting…";
+            await _simulatorConnection.DisconnectAsync();
+            IsConnected = false;
+            ConnectionAction = "Connect";
+            ConnectionStatus = "Simulator disconnected";
+            return;
+        }
+
         ConnectionStatus = "Connecting…";
         IsConnected = await _simulatorConnection.ConnectAsync();
+        ConnectionAction = IsConnected ? "Disconnect" : "Connect";
         ConnectionStatus = IsConnected
             ? $"MSFS 2024 connected · {_simulatorConnection.InputEventCount} controls"
             : _simulatorConnection.LastError ?? "Connection failed";

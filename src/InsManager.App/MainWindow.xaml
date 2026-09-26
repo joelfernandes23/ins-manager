@@ -51,15 +51,30 @@
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="10" />
                     <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="10" />
+                    <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
                 <TextBlock VerticalAlignment="Center" FontSize="22" FontWeight="SemiBold" Text="INS Manager" />
                 <Border Grid.Column="1" Padding="11,6" Background="{DynamicResource StatusBackgroundBrush}" CornerRadius="14">
                     <StackPanel Orientation="Horizontal">
-                        <Ellipse Width="7" Height="7" Margin="0,0,7,0" Fill="{DynamicResource MutedTextBrush}" />
+                        <Ellipse Width="7" Height="7" Margin="0,0,7,0">
+                            <Ellipse.Style>
+                                <Style TargetType="Ellipse">
+                                    <Setter Property="Fill" Value="{DynamicResource MutedTextBrush}" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding IsConnected}" Value="True">
+                                            <Setter Property="Fill" Value="#2E9D61" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Ellipse.Style>
+                        </Ellipse>
                         <TextBlock FontSize="12" Foreground="{DynamicResource SecondaryTextBrush}" Text="{Binding ConnectionStatus}" />
                     </StackPanel>
                 </Border>
-                <Button Grid.Column="3" Style="{StaticResource IconButton}" Command="{Binding OpenSettingsCommand}" ToolTip="Settings">
+                <Button Grid.Column="3" Height="30" Padding="12,0" VerticalAlignment="Center"
+                        Command="{Binding ToggleConnectionCommand}" Content="{Binding ConnectionAction}" />
+                <Button Grid.Column="5" Style="{StaticResource IconButton}" Command="{Binding OpenSettingsCommand}" ToolTip="Settings">
                     <TextBlock FontFamily="Segoe MDL2 Assets" FontSize="16" Text="&#xE713;" />
                 </Button>
             </Grid>

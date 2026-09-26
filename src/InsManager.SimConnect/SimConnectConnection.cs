@@ -25,7 +25,7 @@ public sealed class SimConnectConnection : ISimulatorConnection, IAsyncDisposabl
         {
             if (IsConnected) return true;
 
-            await DisconnectAsync();
+            await DisconnectCoreAsync();
             LastError = null;
             var client = new SimConnectClient
             {
@@ -44,7 +44,7 @@ public sealed class SimConnectConnection : ISimulatorConnection, IAsyncDisposabl
             if (!client.IsMSFS2024)
             {
                 LastError = "INS Manager currently supports MSFS 2024 only.";
-                await DisconnectAsync();
+                await DisconnectCoreAsync();
                 return false;
             }
 
@@ -56,7 +56,7 @@ public sealed class SimConnectConnection : ISimulatorConnection, IAsyncDisposabl
             or InvalidOperationException)
         {
             LastError = "Start MSFS 2024 and load the FSS 727, then connect again.";
-            await DisconnectAsync();
+            await DisconnectCoreAsync();
             return false;
         }
         finally
@@ -121,7 +121,22 @@ public sealed class SimConnectConnection : ISimulatorConnection, IAsyncDisposabl
         LastError = eventArgs.Context ?? eventArgs.Exception?.Message ?? eventArgs.Error.ToString();
     }
 
-    private async Task DisconnectAsync()
+    public async Task DisconnectAsync(CancellationToken cancellationToken = default)
+    {
+        await _connectionLock.WaitAsync(cancellationToken);
+        try
+        {
+            await DisconnectCoreAsync();
+            LastError = null;
+            InputEventCount = 0;
+        }
+        finally
+        {
+            _connectionLock.Release();
+        }
+    }
+
+    private async Task DisconnectCoreAsync()
     {
         _messageLoopCancellation?.Cancel();
         if (_messageLoop is not null)
@@ -150,7 +165,7 @@ public sealed class SimConnectConnection : ISimulatorConnection, IAsyncDisposabl
 
     public async ValueTask DisposeAsync()
     {
-        await DisconnectAsync();
+        await DisconnectCoreAsync();
         _connectionLock.Dispose();
     }
 

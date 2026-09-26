@@ -9,4 +9,5 @@ public interface ISimulatorConnection
     string? LastError { get; }
 
     Task<bool> ConnectAsync(CancellationToken cancellationToken = default);
+    Task DisconnectAsync(CancellationToken cancellationToken = default);
 }

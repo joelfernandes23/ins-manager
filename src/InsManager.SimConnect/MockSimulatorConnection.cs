@@ -16,4 +16,10 @@ public sealed class MockSimulatorConnection : ISimulatorConnection
         IsConnected = true;
         return true;
     }
+
+    public Task DisconnectAsync(CancellationToken cancellationToken = default)
+    {
+        IsConnected = false;
+        return Task.CompletedTask;
+    }
 }
