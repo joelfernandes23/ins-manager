@@ -1,19 +1,19 @@
-# 727 INS Manager
+# INS Manager
 
-A Windows desktop utility for managing the FlightSim Studio Boeing 727 CIVA INS in Microsoft Flight Simulator.
+A Windows desktop utility for managing classic inertial navigation systems in Microsoft Flight Simulator.
 
 ## Status
 
 Initial UI and development environment scaffold. Simulator integration is not implemented yet.
 
-The application currently keeps simulator control in mock mode, but downloads real flight plans from SimBrief. Open Settings to save your numeric SimBrief Pilot ID and choose a dark or light theme, then use the download button to load the latest route into the ten-slot INS display.
+The application currently supports the FlightSim Studio Boeing 727 and keeps simulator control in mock mode, but downloads real flight plans from SimBrief. Open Settings to choose an aircraft, save your numeric SimBrief Pilot ID, and select a dark or light theme. Then use the download button to load the latest route into the ten-slot INS display.
 
 ## Architecture
 
 - `InsManager.App` — WPF views, MVVM view models, and application composition
 - `InsManager.Core` — simulator-independent route and INS domain contracts
 - `InsManager.Infrastructure` — SimBrief, settings, and persistence adapters
-- `InsManager.SimConnect` — MSFS connectivity and aircraft-specific integration
+- `InsManager.SimConnect` — MSFS connectivity and aircraft-specific adapters
 - `InsManager.Tests` — automated domain and adapter tests
 
 ## Prerequisites

@@ -24,6 +24,7 @@ public partial class MainViewModel : ObservableObject
     [ObservableProperty] private string _accuracy = "—";
     [ObservableProperty] private string _simBriefPilotId = "";
     [ObservableProperty] private string _selectedTheme = "Dark";
+    [ObservableProperty] private string _selectedAircraft = "FSS Boeing 727";
     [ObservableProperty] private bool _autoManageWaypoints = true;
     [ObservableProperty] private bool _correctDrift = true;
     [ObservableProperty] private bool _isConnected;
@@ -46,12 +47,16 @@ public partial class MainViewModel : ObservableObject
 
     public ObservableCollection<InsSlot> Slots { get; } = [];
     public IReadOnlyList<string> Themes { get; } = ["Dark", "Light"];
+    public IReadOnlyList<string> SupportedAircraft { get; } = ["FSS Boeing 727"];
 
     public async Task InitializeAsync()
     {
         var settings = await _settingsService.LoadAsync();
         SimBriefPilotId = settings.SimBriefPilotId;
         SelectedTheme = settings.Theme;
+        SelectedAircraft = SupportedAircraft.Contains(settings.Aircraft)
+            ? settings.Aircraft
+            : SupportedAircraft[0];
         _themeService.Apply(SelectedTheme);
     }
 
@@ -66,7 +71,7 @@ public partial class MainViewModel : ObservableObject
     [RelayCommand]
     private async Task SaveSettingsAsync()
     {
-        await _settingsService.SaveAsync(new AppSettings(SimBriefPilotId.Trim(), SelectedTheme));
+        await _settingsService.SaveAsync(new AppSettings(SimBriefPilotId.Trim(), SelectedTheme, SelectedAircraft));
         IsSettingsOpen = false;
     }
 
@@ -90,7 +95,7 @@ public partial class MainViewModel : ObservableObject
         try
         {
             var pilotId = SimBriefPilotId.Trim();
-            await _settingsService.SaveAsync(new AppSettings(pilotId, SelectedTheme));
+            await _settingsService.SaveAsync(new AppSettings(pilotId, SelectedTheme, SelectedAircraft));
             var route = await _routeProvider.GetLatestRouteAsync(pilotId);
             PopulateSlots(route);
             RouteStatus = $"Flight plan downloaded · {route.Count} waypoints";

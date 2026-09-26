@@ -1,7 +1,7 @@
 <Window x:Class="InsManager.App.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="727 INS Manager" Width="1120" Height="720" MinWidth="900" MinHeight="600"
+        Title="INS Manager" Width="1120" Height="720" MinWidth="900" MinHeight="600"
         Background="{DynamicResource WindowBackgroundBrush}"
         Foreground="{DynamicResource PrimaryTextBrush}"
         WindowStartupLocation="CenterScreen">
@@ -40,8 +40,8 @@
             <Grid>
                 <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /><ColumnDefinition Width="12" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
                 <StackPanel>
-                    <TextBlock FontSize="28" FontWeight="SemiBold" Text="727 INS MANAGER" />
-                    <TextBlock Margin="0,6,0,0" Foreground="{DynamicResource SecondaryTextBrush}" Text="FlightSim Studio 727 · CIVA route automation" />
+                    <TextBlock FontSize="28" FontWeight="SemiBold" Text="INS MANAGER" />
+                    <TextBlock Margin="0,6,0,0" Foreground="{DynamicResource SecondaryTextBrush}" Text="Classic navigation · automatic waypoint management" />
                 </StackPanel>
                 <Border Grid.Column="1" Padding="14,8" Background="{DynamicResource StatusBackgroundBrush}" CornerRadius="18">
                     <StackPanel Orientation="Horizontal">
@@ -64,7 +64,7 @@
                                 <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
                                 <StackPanel VerticalAlignment="Center">
                                     <TextBlock FontSize="20" FontWeight="SemiBold" Text="SimBrief" />
-                                    <TextBlock Margin="0,3,0,0" Foreground="{DynamicResource SecondaryTextBrush}" Text="{Binding SimBriefPilotId}" />
+                                    <TextBlock Margin="0,3,0,0" Foreground="{DynamicResource SecondaryTextBrush}" Text="{Binding SelectedAircraft}" />
                                 </StackPanel>
                                 <Grid Grid.Column="1">
                                     <Button Width="48" Height="48" Padding="0" Command="{Binding DownloadFlightPlanCommand}" ToolTip="Download latest flight plan">
@@ -140,22 +140,27 @@
         <Border Width="390" HorizontalAlignment="Right" Padding="28" Background="{DynamicResource PanelBackgroundBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1,0,0,0"
                 Visibility="{Binding IsSettingsOpen, Converter={StaticResource BooleanToVisibilityConverter}}">
             <Grid>
-                <Grid.RowDefinitions><RowDefinition Height="Auto" /><RowDefinition Height="32" /><RowDefinition Height="Auto" /><RowDefinition Height="28" /><RowDefinition Height="Auto" /><RowDefinition Height="*" /><RowDefinition Height="Auto" /></Grid.RowDefinitions>
+                <Grid.RowDefinitions><RowDefinition Height="Auto" /><RowDefinition Height="32" /><RowDefinition Height="Auto" /><RowDefinition Height="28" /><RowDefinition Height="Auto" /><RowDefinition Height="28" /><RowDefinition Height="Auto" /><RowDefinition Height="*" /><RowDefinition Height="Auto" /></Grid.RowDefinitions>
                 <Grid><Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
                     <TextBlock FontSize="25" FontWeight="SemiBold" Text="Settings" />
                     <Button Grid.Column="1" Style="{StaticResource IconButton}" Command="{Binding CloseSettingsCommand}" ToolTip="Close"><TextBlock FontSize="21" Text="×" /></Button>
                 </Grid>
                 <StackPanel Grid.Row="2">
+                    <TextBlock Foreground="{DynamicResource SecondaryTextBrush}" Text="Aircraft" />
+                    <ComboBox Margin="0,8,0,0" Padding="10" ItemsSource="{Binding SupportedAircraft}" SelectedItem="{Binding SelectedAircraft}" />
+                    <TextBlock Margin="0,7,0,0" FontSize="12" TextWrapping="Wrap" Foreground="{DynamicResource MutedTextBrush}" Text="Additional aircraft adapters will appear here as support is added." />
+                </StackPanel>
+                <StackPanel Grid.Row="4">
                     <TextBlock Foreground="{DynamicResource SecondaryTextBrush}" Text="SimBrief Pilot ID" />
                     <TextBox Margin="0,8,0,0" Padding="12" Background="{DynamicResource InsetBackgroundBrush}" Foreground="{DynamicResource PrimaryTextBrush}" BorderBrush="{DynamicResource BorderBrush}"
                              Text="{Binding SimBriefPilotId, UpdateSourceTrigger=PropertyChanged}" />
                     <TextBlock Margin="0,7,0,0" FontSize="12" TextWrapping="Wrap" Foreground="{DynamicResource MutedTextBrush}" Text="Find this numeric ID in your SimBrief account settings." />
                 </StackPanel>
-                <StackPanel Grid.Row="4">
+                <StackPanel Grid.Row="6">
                     <TextBlock Foreground="{DynamicResource SecondaryTextBrush}" Text="Theme" />
                     <ComboBox Margin="0,8,0,0" Padding="10" ItemsSource="{Binding Themes}" SelectedItem="{Binding SelectedTheme}" />
                 </StackPanel>
-                <Button Grid.Row="6" HorizontalAlignment="Right" Command="{Binding SaveSettingsCommand}" Content="Save settings" />
+                <Button Grid.Row="8" HorizontalAlignment="Right" Command="{Binding SaveSettingsCommand}" Content="Save settings" />
             </Grid>
         </Border>
     </Grid>
