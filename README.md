@@ -2,7 +2,7 @@
 
 INS Manager is a small Windows utility for the classic inertial navigation systems found in Microsoft Flight Simulator aircraft.
 
-The first release supports the FlightSim Studio Boeing 727 in Microsoft Flight Simulator 2024. Support for other aircraft may follow once the 727 integration has earned its keep.
+The first release officially supports the FlightSim Studio Boeing 727 in Microsoft Flight Simulator 2024. Support for other aircraft may follow once the 727 integration has earned its keep.
 
 ## What it does
 
@@ -17,7 +17,7 @@ The first release supports the FlightSim Studio Boeing 727 in Microsoft Flight S
 ## Requirements
 
 - Windows 10 or Windows 11
-- Microsoft Flight Simulator 2024
+- Microsoft Flight Simulator 2024, or Microsoft Flight Simulator 2020 for experimental use
 - FlightSim Studio Boeing 727
 - A SimBrief account
 
@@ -33,6 +33,12 @@ The release package includes the .NET runtime. There is no separate runtime to i
 6. Select the download button to load the current SimBrief flight plan.
 
 Settings are stored for the current Windows user.
+
+## MSFS 2020
+
+MSFS 2020 connections are allowed on an experimental basis. The application will identify them as experimental, but it will not prevent waypoint, direct-to, or drift-correction commands from being sent.
+
+MSFS 2020 is not an officially supported platform. The current adapter was developed and tested against MSFS 2024 and the FSS 727. Reports from 2020 users are welcome, especially when accompanied by the aircraft version and a useful description of what went wrong.
 
 ## Development
 

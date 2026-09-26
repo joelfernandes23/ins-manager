@@ -49,7 +49,7 @@ public sealed class SimConnectConnection : ISimulatorConnection, IAsyncDisposabl
             or DllNotFoundException
             or InvalidOperationException)
         {
-            LastError = "Start MSFS 2024 and load the FSS 727, then connect again.";
+            LastError = "Start MSFS, load the FSS 727, then connect again.";
             await DisconnectCoreAsync();
             return false;
         }
@@ -78,7 +78,7 @@ public sealed class SimConnectConnection : ISimulatorConnection, IAsyncDisposabl
 
     private void OnConnectionStatusChanged(object? sender, ConnectionStatusChangedEventArgs eventArgs)
     {
-        if (eventArgs.IsDisconnected) LastError = "MSFS 2024 disconnected.";
+        if (eventArgs.IsDisconnected) LastError = "MSFS disconnected.";
     }
 
     private void OnErrorOccurred(object? sender, SimConnectErrorEventArgs eventArgs)
@@ -193,7 +193,7 @@ public sealed class SimConnectConnection : ISimulatorConnection, IAsyncDisposabl
     private SimConnectClient GetConnectedClient() =>
         _client is { IsConnected: true } client
             ? client
-            : throw new InvalidOperationException("MSFS 2024 is not connected.");
+            : throw new InvalidOperationException("MSFS is not connected.");
 
     private async Task DisconnectCoreAsync()
     {

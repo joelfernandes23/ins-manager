@@ -8,7 +8,7 @@
     <UseWPF>true</UseWPF>
     <AssemblyName>INSManager</AssemblyName>
     <Product>INS Manager</Product>
-    <Description>Classic INS route manager for Microsoft Flight Simulator 2024</Description>
+    <Description>Classic INS route manager for Microsoft Flight Simulator</Description>
     <Authors>Joel Fernandes</Authors>
     <RepositoryUrl>https://github.com/joelfernandes23/ins-manager</RepositoryUrl>
     <ApplicationIcon>Assets\ins.ico</ApplicationIcon>

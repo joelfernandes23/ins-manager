@@ -149,7 +149,9 @@ public partial class MainViewModel : ObservableObject
         }
         ConnectionAction = IsConnected ? "Disconnect" : "Connect";
         ConnectionStatus = IsConnected
-            ? "MSFS 2024 connected"
+            ? _simulatorConnection.IsMsfs2024
+                ? "MSFS 2024 connected"
+                : "MSFS 2020 connected (experimental)"
             : _simulatorConnection.LastError ?? "Connection failed";
     }
 
@@ -212,7 +214,7 @@ public partial class MainViewModel : ObservableObject
 
         if (!IsConnected)
         {
-            RouteStatus = "Connect to MSFS 2024 before sending a waypoint.";
+            RouteStatus = "Connect to MSFS before sending a waypoint.";
             return;
         }
 
@@ -257,7 +259,7 @@ public partial class MainViewModel : ObservableObject
 
         if (!IsConnected)
         {
-            RouteStatus = "Connect to MSFS 2024 before selecting direct-to.";
+            RouteStatus = "Connect to MSFS before selecting direct-to.";
             return;
         }
 

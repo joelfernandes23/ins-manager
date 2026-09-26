@@ -33,7 +33,7 @@ await using var client = new SimConnectClient
 
 try
 {
-    Console.WriteLine("Connecting to MSFS 2024...");
+    Console.WriteLine("Connecting to MSFS...");
     await client.ConnectAsync(IntPtr.Zero, 0, 0, cancellation.Token);
 
     if (showCivaState)
@@ -101,7 +101,7 @@ try
 }
 catch (OperationCanceledException)
 {
-    Console.Error.WriteLine("The scan timed out. Keep MSFS 2024 running with the target aircraft loaded, then try again.");
+    Console.Error.WriteLine("The scan timed out. Keep MSFS running with the target aircraft loaded, then try again.");
     return 1;
 }
 catch (Exception exception)
