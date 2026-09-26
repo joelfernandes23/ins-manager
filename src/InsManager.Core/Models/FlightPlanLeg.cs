@@ -5,4 +5,5 @@ public sealed record FlightPlanLeg(
     Waypoint Waypoint,
     string Coordinates,
     string Track,
-    string Distance);
+    string Distance,
+    string InsSlot = "—");

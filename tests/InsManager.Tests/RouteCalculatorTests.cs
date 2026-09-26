@@ -21,6 +21,7 @@ public sealed class RouteCalculatorTests
         Assert.Equal("N51.6462 E000.1558", legs[0].Coordinates);
         Assert.Equal("123°", legs[0].Track);
         Assert.Equal("42.5 NM", legs[0].Distance);
+        Assert.Equal("—", legs[0].InsSlot);
         Assert.EndsWith("°", legs[1].Track);
         Assert.EndsWith(" NM", legs[1].Distance);
     }

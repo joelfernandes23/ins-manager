@@ -203,6 +203,21 @@ public partial class MainViewModel : ObservableObject
     private void SetSlot(int slotNumber, Waypoint? waypoint, string state)
     {
         Slots[slotNumber] = new InsSlot(slotNumber, waypoint, state);
+        RefreshInsAssignments();
+    }
+
+    private void RefreshInsAssignments()
+    {
+        for (var index = 0; index < FlightPlan.Count; index++)
+        {
+            var leg = FlightPlan[index];
+            var slots = Slots
+                .Where(slot => slot.Number > 0 && ReferenceEquals(slot.Waypoint, leg.Waypoint))
+                .Select(slot => slot.Number.ToString())
+                .ToArray();
+            var assignment = slots.Length == 0 ? "—" : string.Join(", ", slots);
+            if (leg.InsSlot != assignment) FlightPlan[index] = leg with { InsSlot = assignment };
+        }
     }
 
     private void ResetSlots()

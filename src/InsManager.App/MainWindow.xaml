@@ -134,7 +134,8 @@
                             <GridViewColumn Header="CO-ORDINATES" Width="176" DisplayMemberBinding="{Binding Coordinates}" />
                             <GridViewColumn Header="TRACK" Width="66" DisplayMemberBinding="{Binding Track}" />
                             <GridViewColumn Header="DIST." Width="78" DisplayMemberBinding="{Binding Distance}" />
-                            <GridViewColumn Header="ACTION" Width="190">
+                            <GridViewColumn Header="INS" Width="46" DisplayMemberBinding="{Binding InsSlot}" />
+                            <GridViewColumn Header="ACTION" Width="144">
                                 <GridViewColumn.CellTemplate>
                                     <DataTemplate>
                                         <StackPanel Orientation="Horizontal">
