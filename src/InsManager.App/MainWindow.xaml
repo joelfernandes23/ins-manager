@@ -1,105 +1,237 @@
 <Window x:Class="InsManager.App.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="727 INS Manager" Width="1120" Height="720" MinWidth="900" MinHeight="600"
-        Background="#0B1014" Foreground="#E8EEF2" WindowStartupLocation="CenterScreen">
+        Title="INS Manager"
+        Icon="Assets/ins.ico"
+        Width="760"
+        Height="560"
+        ResizeMode="NoResize"
+        WindowStartupLocation="CenterScreen"
+        Background="{DynamicResource WindowBackgroundBrush}"
+        Foreground="{DynamicResource PrimaryTextBrush}">
     <Window.Resources>
         <Style TargetType="Button">
-            <Setter Property="Padding" Value="18,10" />
-            <Setter Property="Background" Value="#D98B34" />
+            <Setter Property="Padding" Value="14,8" />
+            <Setter Property="Background" Value="{DynamicResource AccentBrush}" />
             <Setter Property="Foreground" Value="#101316" />
             <Setter Property="BorderThickness" Value="0" />
             <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Cursor" Value="Hand" />
+        </Style>
+        <Style x:Key="IconButton" TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
+            <Setter Property="Width" Value="36" />
+            <Setter Property="Height" Value="36" />
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="Background" Value="{DynamicResource StatusBackgroundBrush}" />
+            <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}" />
         </Style>
         <Style x:Key="Panel" TargetType="Border">
-            <Setter Property="Background" Value="#121A20" />
-            <Setter Property="BorderBrush" Value="#25313A" />
+            <Setter Property="Background" Value="{DynamicResource PanelBackgroundBrush}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}" />
             <Setter Property="BorderThickness" Value="1" />
-            <Setter Property="CornerRadius" Value="8" />
-            <Setter Property="Padding" Value="20" />
+            <Setter Property="CornerRadius" Value="7" />
+            <Setter Property="Padding" Value="14" />
         </Style>
     </Window.Resources>
 
-    <Grid Margin="28">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="20" />
-            <RowDefinition Height="*" />
-            <RowDefinition Height="16" />
-            <RowDefinition Height="Auto" />
-        </Grid.RowDefinitions>
+    <Grid>
+        <Grid Margin="18">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="36" />
+                <RowDefinition Height="12" />
+                <RowDefinition Height="76" />
+                <RowDefinition Height="12" />
+                <RowDefinition Height="50" />
+                <RowDefinition Height="12" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
 
-        <Grid>
-            <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
-            <StackPanel>
-                <TextBlock FontSize="28" FontWeight="SemiBold" Text="727 INS MANAGER" />
-                <TextBlock Margin="0,6,0,0" Foreground="#8FA0AA" Text="FlightSim Studio 727 · CIVA route automation" />
-            </StackPanel>
-            <Border Grid.Column="1" Padding="14,8" Background="#172127" CornerRadius="18">
-                <StackPanel Orientation="Horizontal">
-                    <Ellipse Width="9" Height="9" Margin="0,0,8,0" Fill="#67737A" />
-                    <TextBlock Foreground="#B7C2C8" Text="Simulator disconnected" />
-                </StackPanel>
-            </Border>
-        </Grid>
-
-        <Grid Grid.Row="2">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="0.95*" /><ColumnDefinition Width="20" /><ColumnDefinition Width="1.35*" />
-            </Grid.ColumnDefinitions>
-            <StackPanel>
-                <Border Style="{StaticResource Panel}">
-                    <StackPanel>
-                        <TextBlock FontSize="12" Foreground="#8FA0AA" Text="ROUTE SOURCE" />
-                        <TextBlock Margin="0,7,0,16" FontSize="20" FontWeight="SemiBold" Text="SimBrief" />
-                        <TextBlock Foreground="#8FA0AA" Text="Pilot ID" />
-                        <TextBox Margin="0,7,0,16" Padding="11" Background="#0B1014" BorderBrush="#35434C" Foreground="White" Text="Not configured" />
-                        <Button HorizontalAlignment="Left" Content="Fetch latest flight" />
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="10" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="10" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <TextBlock VerticalAlignment="Center" FontSize="22" FontWeight="SemiBold" Text="INS Manager" />
+                <Border Grid.Column="1" Padding="11,6" Background="{DynamicResource StatusBackgroundBrush}" CornerRadius="14">
+                    <StackPanel Orientation="Horizontal">
+                        <Ellipse Width="7" Height="7" Margin="0,0,7,0">
+                            <Ellipse.Style>
+                                <Style TargetType="Ellipse">
+                                    <Setter Property="Fill" Value="{DynamicResource MutedTextBrush}" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding IsConnected}" Value="True">
+                                            <Setter Property="Fill" Value="#2E9D61" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Ellipse.Style>
+                        </Ellipse>
+                        <TextBlock FontSize="12" Foreground="{DynamicResource SecondaryTextBrush}" Text="{Binding ConnectionStatus}" />
                     </StackPanel>
                 </Border>
-                <Border Margin="0,20,0,0" Style="{StaticResource Panel}">
-                    <StackPanel>
-                        <TextBlock FontSize="12" Foreground="#8FA0AA" Text="AUTOMATION" />
-                        <CheckBox Margin="0,16,0,0" Foreground="#E8EEF2" Content="Auto-manage waypoint slots" />
-                        <CheckBox Margin="0,13,0,0" Foreground="#E8EEF2" Content="Correct INS drift" />
-                        <TextBlock Margin="0,18,0,5" Foreground="#8FA0AA" Text="Correction interval" />
-                        <ComboBox Padding="8" SelectedIndex="1">
-                            <ComboBoxItem Content="30 seconds" /><ComboBoxItem Content="60 seconds" /><ComboBoxItem Content="5 minutes" />
-                        </ComboBox>
-                    </StackPanel>
-                </Border>
-            </StackPanel>
+                <Button Grid.Column="3" Height="30" Padding="12,0" VerticalAlignment="Center"
+                        Command="{Binding ToggleConnectionCommand}" Content="{Binding ConnectionAction}" />
+                <Button Grid.Column="5" Style="{StaticResource IconButton}" Command="{Binding OpenSettingsCommand}" ToolTip="Settings">
+                    <TextBlock FontFamily="Segoe MDL2 Assets" FontSize="16" Text="&#xE713;" />
+                </Button>
+            </Grid>
 
-            <Border Grid.Column="2" Style="{StaticResource Panel}">
+            <Border Grid.Row="2" Style="{StaticResource Panel}">
                 <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto" /><RowDefinition Height="22" /><RowDefinition Height="Auto" />
-                        <RowDefinition Height="22" /><RowDefinition Height="*" />
-                    </Grid.RowDefinitions>
-                    <TextBlock FontSize="12" Foreground="#8FA0AA" Text="INS STATUS" />
-                    <UniformGrid Grid.Row="2" Columns="3">
-                        <StackPanel><TextBlock Foreground="#8FA0AA" Text="FROM" /><TextBlock Margin="0,5,0,0" FontFamily="Consolas" FontSize="31" Foreground="#F2A84B" Text="—" /></StackPanel>
-                        <StackPanel><TextBlock Foreground="#8FA0AA" Text="TO" /><TextBlock Margin="0,5,0,0" FontFamily="Consolas" FontSize="31" Foreground="#F2A84B" Text="—" /></StackPanel>
-                        <StackPanel><TextBlock Foreground="#8FA0AA" Text="ACCURACY" /><TextBlock Margin="0,5,0,0" FontFamily="Consolas" FontSize="31" Foreground="#F2A84B" Text="—" /></StackPanel>
-                    </UniformGrid>
-                    <StackPanel Grid.Row="4">
-                        <TextBlock Margin="0,0,0,12" FontSize="17" FontWeight="SemiBold" Text="Waypoint buffer" />
-                        <Border Padding="16" Background="#0B1014" BorderBrush="#25313A" BorderThickness="1" CornerRadius="5">
-                            <Grid>
-                                <Grid.ColumnDefinitions><ColumnDefinition Width="55" /><ColumnDefinition Width="*" /><ColumnDefinition Width="130" /></Grid.ColumnDefinitions>
-                                <TextBlock Foreground="#75848D" Text="SLOT" /><TextBlock Grid.Column="1" Foreground="#75848D" Text="WAYPOINT" /><TextBlock Grid.Column="2" Foreground="#75848D" Text="STATE" />
-                            </Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="140" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <StackPanel VerticalAlignment="Center">
+                        <TextBlock FontWeight="SemiBold" Text="SimBrief" />
+                        <TextBlock Margin="0,3,0,0" FontSize="12" Foreground="{DynamicResource SecondaryTextBrush}" Text="{Binding SelectedAircraft}" />
+                    </StackPanel>
+                    <TextBlock Grid.Column="1" Margin="12,0" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" Foreground="{DynamicResource SecondaryTextBrush}" Text="{Binding RouteStatus}" />
+                    <Grid Grid.Column="2" VerticalAlignment="Center">
+                        <Button Width="42" Height="42" Padding="0" Command="{Binding DownloadFlightPlanCommand}" ToolTip="Download flight plan">
+                            <TextBlock FontSize="23" Text="↓" />
+                        </Button>
+                        <Border Width="18" Height="18" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,-5,-5,0" CornerRadius="9">
+                            <Border.Style>
+                                <Style TargetType="Border">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding DownloadStatus}" Value="Success"><Setter Property="Visibility" Value="Visible" /><Setter Property="Background" Value="#2E9D61" /></DataTrigger>
+                                        <DataTrigger Binding="{Binding DownloadStatus}" Value="Failure"><Setter Property="Visibility" Value="Visible" /><Setter Property="Background" Value="#C94D4D" /></DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Border.Style>
+                            <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="11" FontWeight="Bold" Foreground="White">
+                                <TextBlock.Style>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="Text" Value="✓" />
+                                        <Style.Triggers><DataTrigger Binding="{Binding DownloadStatus}" Value="Failure"><Setter Property="Text" Value="×" /></DataTrigger></Style.Triggers>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
                         </Border>
-                        <TextBlock Margin="0,42,0,0" HorizontalAlignment="Center" Foreground="#67737A" Text="Connect to MSFS and load a route to begin" />
+                    </Grid>
+                    <ProgressBar Grid.ColumnSpan="3" Height="2" VerticalAlignment="Bottom" IsIndeterminate="True" Visibility="{Binding IsDownloading, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                </Grid>
+            </Border>
+
+            <Border Grid.Row="4" Style="{StaticResource Panel}" Padding="14,8">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                        <CheckBox Foreground="{DynamicResource PrimaryTextBrush}" Content="Auto waypoints" IsChecked="{Binding AutoManageWaypoints}" />
+                        <CheckBox Margin="18,0,0,0" Foreground="{DynamicResource PrimaryTextBrush}" Content="Correct drift" IsChecked="{Binding CorrectDrift}" />
+                    </StackPanel>
+                    <TextBlock Grid.Column="1" VerticalAlignment="Center" Foreground="{DynamicResource SecondaryTextBrush}" Text="FROM" />
+                    <TextBlock Grid.Column="2" Margin="7,0,16,0" VerticalAlignment="Center" FontFamily="Consolas" FontSize="20" Foreground="#F2A84B" Text="{Binding FromSlot}" />
+                    <StackPanel Grid.Column="3" Orientation="Horizontal" VerticalAlignment="Center">
+                        <TextBlock Foreground="{DynamicResource SecondaryTextBrush}" Text="TO" />
+                        <TextBlock Margin="7,0,0,0" FontFamily="Consolas" FontSize="20" Foreground="#F2A84B" Text="{Binding ToSlot}" />
                     </StackPanel>
                 </Grid>
             </Border>
+
+            <Border Grid.Row="6" Style="{StaticResource Panel}" Padding="0">
+                <ListView ItemsSource="{Binding FlightPlan}" Background="Transparent" BorderThickness="0" Foreground="{DynamicResource PrimaryTextBrush}" ScrollViewer.VerticalScrollBarVisibility="Auto">
+                    <ListView.View>
+                        <GridView AllowsColumnReorder="False">
+                            <GridViewColumn Header="NO." Width="42" DisplayMemberBinding="{Binding Number}" />
+                            <GridViewColumn Header="WPT" Width="82" DisplayMemberBinding="{Binding Waypoint.Identifier}" />
+                            <GridViewColumn Header="CO-ORDINATES" Width="176" DisplayMemberBinding="{Binding Coordinates}" />
+                            <GridViewColumn Header="TRACK" Width="66" DisplayMemberBinding="{Binding Track}" />
+                            <GridViewColumn Header="DIST." Width="78" DisplayMemberBinding="{Binding Distance}" />
+                            <GridViewColumn Header="INS" Width="46" DisplayMemberBinding="{Binding InsSlot}" />
+                            <GridViewColumn Header="ACTION" Width="144">
+                                <GridViewColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <StackPanel Orientation="Horizontal">
+                                            <Button Margin="0,2,6,2" Padding="10,4" Content="Send"
+                                                    Command="{Binding DataContext.OpenSendDialogCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                    CommandParameter="{Binding}" />
+                                            <Button Margin="0,2" Padding="10,4" Content="DCT"
+                                                    Command="{Binding DataContext.OpenDirectDialogCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                    CommandParameter="{Binding}" />
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </GridViewColumn.CellTemplate>
+                            </GridViewColumn>
+                        </GridView>
+                    </ListView.View>
+                </ListView>
+            </Border>
         </Grid>
 
-        <Grid Grid.Row="4">
-            <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
-            <TextBlock VerticalAlignment="Center" Foreground="#67737A" Text="Prototype UI · no simulator commands are sent yet" />
-            <Button Grid.Column="1" IsEnabled="False" Content="Start automation" />
-        </Grid>
+        <Border Background="#66000000" Visibility="{Binding IsSettingsOpen, Converter={StaticResource BooleanToVisibilityConverter}}" />
+        <Border Width="310" HorizontalAlignment="Right" Padding="22" Background="{DynamicResource PanelBackgroundBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1,0,0,0"
+                Visibility="{Binding IsSettingsOpen, Converter={StaticResource BooleanToVisibilityConverter}}">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="36" /><RowDefinition Height="24" /><RowDefinition Height="Auto" />
+                    <RowDefinition Height="22" /><RowDefinition Height="Auto" /><RowDefinition Height="22" />
+                    <RowDefinition Height="Auto" /><RowDefinition Height="22" /><RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" /><RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                <Grid>
+                    <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+                    <TextBlock VerticalAlignment="Center" FontSize="20" FontWeight="SemiBold" Text="Settings" />
+                    <Button Grid.Column="1" Style="{StaticResource IconButton}" Command="{Binding CloseSettingsCommand}"><TextBlock FontSize="19" Text="×" /></Button>
+                </Grid>
+                <StackPanel Grid.Row="2">
+                    <TextBlock Foreground="{DynamicResource SecondaryTextBrush}" Text="Aircraft" />
+                    <ComboBox Margin="0,7,0,0" Padding="8" ItemsSource="{Binding SupportedAircraft}" SelectedItem="{Binding SelectedAircraft}" />
+                </StackPanel>
+                <StackPanel Grid.Row="4">
+                    <TextBlock Foreground="{DynamicResource SecondaryTextBrush}" Text="SimBrief Pilot ID" />
+                    <TextBox Margin="0,7,0,0" Padding="10" Background="{DynamicResource InsetBackgroundBrush}" Foreground="{DynamicResource PrimaryTextBrush}" BorderBrush="{DynamicResource BorderBrush}" Text="{Binding SimBriefPilotId, UpdateSourceTrigger=PropertyChanged}" />
+                </StackPanel>
+                <StackPanel Grid.Row="6">
+                    <TextBlock Foreground="{DynamicResource SecondaryTextBrush}" Text="Theme" />
+                    <ComboBox Margin="0,7,0,0" Padding="8" ItemsSource="{Binding Themes}" SelectedItem="{Binding SelectedTheme}" />
+                </StackPanel>
+                <StackPanel Grid.Row="8">
+                    <TextBlock Foreground="{DynamicResource SecondaryTextBrush}" Text="Drift correction interval" />
+                    <ComboBox Margin="0,7,0,0" Padding="8" DisplayMemberPath="Label" ItemsSource="{Binding DriftIntervals}" SelectedItem="{Binding SelectedDriftInterval}" />
+                </StackPanel>
+                <Button Grid.Row="10" HorizontalAlignment="Right" Command="{Binding SaveSettingsCommand}" Content="Save" />
+            </Grid>
+        </Border>
+
+        <Border Background="#88000000" Visibility="{Binding IsSendDialogOpen, Converter={StaticResource BooleanToVisibilityConverter}}" />
+        <Border Width="310" Padding="22" HorizontalAlignment="Center" VerticalAlignment="Center" Style="{StaticResource Panel}"
+                Visibility="{Binding IsSendDialogOpen, Converter={StaticResource BooleanToVisibilityConverter}}">
+            <StackPanel>
+                <TextBlock FontSize="18" FontWeight="SemiBold" Text="Send waypoint" />
+                <TextBlock Margin="0,8,0,16" FontFamily="Consolas" FontSize="16" Foreground="#F2A84B" Text="{Binding SelectedFlightPlanLeg.Waypoint.Identifier}" />
+                <TextBlock Foreground="{DynamicResource SecondaryTextBrush}" Text="INS slot" />
+                <ComboBox Margin="0,7,0,18" Padding="8" ItemsSource="{Binding InsSlotNumbers}" SelectedItem="{Binding SelectedInsSlot}" />
+                <StackPanel HorizontalAlignment="Right" Orientation="Horizontal">
+                    <Button Margin="0,0,8,0" Background="{DynamicResource StatusBackgroundBrush}" Foreground="{DynamicResource PrimaryTextBrush}" Command="{Binding CancelSendCommand}" Content="Cancel" />
+                    <Button Command="{Binding ConfirmSendCommand}" Content="Send" />
+                </StackPanel>
+            </StackPanel>
+        </Border>
+
+        <Border Background="#88000000" Visibility="{Binding IsDirectDialogOpen, Converter={StaticResource BooleanToVisibilityConverter}}" />
+        <Border Width="330" Padding="22" HorizontalAlignment="Center" VerticalAlignment="Center" Style="{StaticResource Panel}"
+                Visibility="{Binding IsDirectDialogOpen, Converter={StaticResource BooleanToVisibilityConverter}}">
+            <StackPanel>
+                <TextBlock FontSize="18" FontWeight="SemiBold" Text="Direct to waypoint?" />
+                <TextBlock Margin="0,10,0,20" FontFamily="Consolas" FontSize="20" Foreground="#F2A84B" Text="{Binding SelectedFlightPlanLeg.Waypoint.Identifier}" />
+                <StackPanel HorizontalAlignment="Right" Orientation="Horizontal">
+                    <Button Margin="0,0,8,0" Background="{DynamicResource StatusBackgroundBrush}" Foreground="{DynamicResource PrimaryTextBrush}" Command="{Binding CancelDirectCommand}" Content="No" />
+                    <Button Command="{Binding ConfirmDirectCommand}" Content="Yes" />
+                </StackPanel>
+            </StackPanel>
+        </Border>
     </Grid>
 </Window>

@@ -6,6 +6,27 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
+    <AssemblyName>INSManager</AssemblyName>
+    <Product>INS Manager</Product>
+    <Description>Classic INS route manager for Microsoft Flight Simulator</Description>
+    <Authors>Joel Fernandes</Authors>
+    <RepositoryUrl>https://github.com/joelfernandes23/ins-manager</RepositoryUrl>
+    <ApplicationIcon>Assets\ins.ico</ApplicationIcon>
   </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\InsManager.Core\InsManager.Core.csproj" />
+    <ProjectReference Include="..\InsManager.Infrastructure\InsManager.Infrastructure.csproj" />
+    <ProjectReference Include="..\InsManager.SimConnect\InsManager.SimConnect.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Assets\ins.ico" />
+  </ItemGroup>
 
 </Project>
