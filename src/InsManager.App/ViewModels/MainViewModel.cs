@@ -1,5 +1,6 @@
 using System.Collections.ObjectModel;
 using System.Net.Http;
+using System.Text.Json;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using InsManager.App.Services;
@@ -99,6 +100,7 @@ public partial class MainViewModel : ObservableObject
         catch (Exception exception) when (exception is ArgumentException
             or HttpRequestException
             or InvalidOperationException
+            or JsonException
             or TaskCanceledException)
         {
             ResetSlots();
