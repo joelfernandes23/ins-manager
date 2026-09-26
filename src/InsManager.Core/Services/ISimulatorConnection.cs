@@ -5,7 +5,6 @@ using InsManager.Core.Models;
 public interface ISimulatorConnection
 {
     bool IsConnected { get; }
-    bool IsMsfs2024 { get; }
     int InputEventCount { get; }
     string? DiagnosticReportPath { get; }
     string? LastError { get; }

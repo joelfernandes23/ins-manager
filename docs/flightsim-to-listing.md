@@ -10,8 +10,6 @@
 
 **Official simulator support:** Microsoft Flight Simulator 2024
 
-**Experimental compatibility:** Microsoft Flight Simulator 2020
-
 **Required aircraft:** FlightSim Studio Boeing 727
 
 **Required service:** SimBrief account and Pilot ID
@@ -28,7 +26,7 @@ It downloads the latest route for your SimBrief Pilot ID and presents every wayp
 
 Optional drift correction can realign the simulated INS position every 10, 30, or 60 minutes. The default is 30 minutes. It corrects the position used by the INS but does not alter the aircraft developer's displayed accuracy model.
 
-The application is developed and tested with Microsoft Flight Simulator 2024. MSFS 2020 connections are allowed for users who wish to try them, but 2020 remains experimental and is not officially supported.
+The application is developed and tested with Microsoft Flight Simulator 2024.
 
 ### Features
 
@@ -59,7 +57,6 @@ Windows may display a SmartScreen warning because the executable does not yet ha
 
 - Only the FlightSim Studio Boeing 727 is supported in version 1.0.0.
 - Microsoft Flight Simulator 2024 is the only officially supported simulator version.
-- Microsoft Flight Simulator 2020 compatibility is experimental and depends on the aircraft exposing the same CIVA local variables.
 - The utility loads en-route waypoints from SimBrief. Procedure expansion from simulator navdata is not included in version 1.0.0.
 - Drift correction realigns the INS position. It does not replace or freeze the FSS accuracy-index display.
 - The application must run on the same Windows computer as Microsoft Flight Simulator.
@@ -84,4 +81,3 @@ INS Manager is an independent utility. It is not affiliated with or endorsed by 
 - SimBrief route download
 - Configurable drift correction
 - Official MSFS 2024 support
-- Experimental MSFS 2020 connections

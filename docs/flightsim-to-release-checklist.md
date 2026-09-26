@@ -16,7 +16,6 @@
 
 - [ ] Upload the full ZIP directly to Flightsim.to
 - [ ] Select Microsoft Flight Simulator 2024 as the supported simulator
-- [ ] Mention MSFS 2020 only as experimental compatibility
 - [ ] List the FSS Boeing 727 and SimBrief as dependencies
 - [ ] Paste the installation and known-limitations sections from `flightsim-to-listing.md`
 - [ ] Link the GitHub source, releases, and issue tracker

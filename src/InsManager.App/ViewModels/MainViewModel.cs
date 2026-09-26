@@ -149,9 +149,7 @@ public partial class MainViewModel : ObservableObject
         }
         ConnectionAction = IsConnected ? "Disconnect" : "Connect";
         ConnectionStatus = IsConnected
-            ? _simulatorConnection.IsMsfs2024
-                ? "MSFS 2024 connected"
-                : "MSFS 2020 connected (experimental)"
+            ? "MSFS connected"
             : _simulatorConnection.LastError ?? "Connection failed";
     }
 
