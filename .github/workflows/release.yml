@@ -1,0 +1,74 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Version to build (for example 0.1.0-beta.1)
+        required: true
+        default: 0.1.0
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: windows-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+          cache: true
+          cache-dependency-path: '**/*.csproj'
+
+      - name: Resolve version
+        id: version
+        shell: pwsh
+        run: |
+          if ('${{ github.ref_type }}' -eq 'tag') {
+            $version = '${{ github.ref_name }}'.TrimStart('v')
+          } else {
+            $version = '${{ inputs.version }}'
+          }
+          "version=$version" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+
+      - name: Restore
+        run: dotnet restore InsManager.sln
+
+      - name: Test
+        run: dotnet test InsManager.sln --configuration Release --no-restore
+
+      - name: Package
+        shell: pwsh
+        run: .\dev.ps1 package ${{ steps.version.outputs.version }}
+
+      - name: Upload workflow artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: INS-Manager-${{ steps.version.outputs.version }}-win-x64
+          path: |
+            artifacts/release/*.zip
+            artifacts/release/*.sha256
+          if-no-files-found: error
+
+      - name: Publish GitHub Release
+        if: github.ref_type == 'tag'
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $assets = Get-ChildItem artifacts/release -File |
+            Where-Object Extension -In '.zip', '.sha256' |
+            ForEach-Object FullName
+          gh release create '${{ github.ref_name }}' @assets `
+            --verify-tag `
+            --generate-notes `
+            --title "INS Manager ${{ steps.version.outputs.version }}"

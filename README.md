@@ -38,6 +38,20 @@ Common development commands:
 .\dev.ps1 scan
 .\dev.ps1 format
 .\dev.ps1 check
+.\dev.ps1 package 0.1.0
+```
+
+The package command creates a self-contained Windows x64 ZIP and SHA-256 checksum in `artifacts\release`. End users do not need to install .NET and should run `INSManager.exe`; this is a desktop utility, not a Community-folder package.
+
+## Releases
+
+Every push and pull request is formatted, built, tested, and packaged by GitHub Actions. A manual Release workflow run produces downloadable workflow artifacts without publishing a release.
+
+Pushing a semantic-version tag publishes the same package as a GitHub Release:
+
+```powershell
+git tag v0.1.0
+git push origin v0.1.0
 ```
 
 The repository uses pre-commit for whitespace, YAML, merge-conflict, and .NET formatting checks. Tests run on the pre-push hook.
