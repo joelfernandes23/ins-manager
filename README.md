@@ -42,16 +42,9 @@ Common development commands:
 
 ## Releases
 
-Release packages are built only by GitHub Actions from the `release` branch. Each push to `release` creates a downloadable candidate artifact. The Release workflow creates the permanent self-contained Windows x64 ZIP and SHA-256 checksum. End users do not need to install .NET and should run `INSManager.exe`; this is a desktop utility, not a Community-folder package.
+Releases are automated by Release Please from Conventional Commit messages on `main`. It maintains the changelog and release pull request, creates the version tag and GitHub Release when that pull request is merged, then GitHub Actions builds and attaches the self-contained Windows x64 ZIP and SHA-256 checksum.
 
-A manual Release workflow run produces downloadable workflow artifacts without publishing a GitHub Release.
-
-Pushing a semantic-version tag publishes the same package as a GitHub Release:
-
-```powershell
-git tag v1.0.0
-git push origin v1.0.0
-```
+Release packages are built only by GitHub Actions. End users do not need to install .NET and should run `INSManager.exe`; this is a desktop utility, not a Community-folder package.
 
 The repository uses pre-commit for whitespace, YAML, merge-conflict, and .NET formatting checks. Tests run on the pre-push hook.
 

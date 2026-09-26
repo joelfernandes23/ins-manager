@@ -38,19 +38,3 @@ jobs:
 
       - name: Test
         run: dotnet test InsManager.sln --configuration Release --no-build
-
-      - name: Package release candidate
-        if: github.ref == 'refs/heads/release'
-        shell: pwsh
-        run: .\scripts\package.ps1 1.0.0
-
-      - name: Upload release candidate
-        if: github.ref == 'refs/heads/release'
-        uses: actions/upload-artifact@v7
-        with:
-          name: INS-Manager-1.0.0-win-x64
-          path: |
-            artifacts/release/*.zip
-            artifacts/release/*.sha256
-          if-no-files-found: error
-          retention-days: 14
