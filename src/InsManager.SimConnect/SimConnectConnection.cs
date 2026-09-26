@@ -41,13 +41,6 @@ public sealed class SimConnectConnection : ISimulatorConnection, IAsyncDisposabl
             _messageLoopCancellation = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
             _messageLoop = ProcessMessagesAsync(client, _messageLoopCancellation.Token);
 
-            if (!client.IsMSFS2024)
-            {
-                LastError = "INS Manager currently supports MSFS 2024 only.";
-                await DisconnectCoreAsync();
-                return false;
-            }
-
             await WriteInputEventReportAsync(client, cancellationToken);
             return true;
         }
