@@ -4,9 +4,9 @@ A Windows desktop utility for managing classic inertial navigation systems in Mi
 
 ## Status
 
-Initial UI and development environment scaffold. Simulator integration is not implemented yet.
+The application currently supports the FlightSim Studio Boeing 727 in Microsoft Flight Simulator 2024. It downloads real flight plans from SimBrief and connects to the simulator through SimConnect.
 
-The application currently supports the FlightSim Studio Boeing 727 and keeps simulator control in mock mode, but downloads real flight plans from SimBrief. Open Settings to choose an aircraft, save your numeric SimBrief Pilot ID, and select a dark or light theme. Then use the download button to load the latest route into the ten-slot INS display.
+Waypoint writes remain disabled until the FSS 727 input-event mapping has been verified. Connecting with the aircraft loaded exports the available controls to `%LocalAppData%\INS Manager\diagnostics\msfs2024-input-events.json`.
 
 ## Architecture
 
@@ -21,6 +21,7 @@ The application currently supports the FlightSim Studio Boeing 727 and keeps sim
 - Windows 10 or Windows 11
 - .NET 8 SDK
 - Python 3.10 or newer for pre-commit
+- Microsoft Flight Simulator 2024 for simulator integration testing
 
 ## Development setup
 
@@ -40,3 +41,9 @@ Common development commands:
 ```
 
 The repository uses pre-commit for whitespace, YAML, merge-conflict, and .NET formatting checks. Tests run on the pre-push hook.
+
+## SimConnect diagnostics
+
+Start MSFS 2024, load the FSS Boeing 727 into a flight, then select **Connect** in INS Manager. A successful connection shows the number of aircraft controls discovered and writes the diagnostic input-event report under `%LocalAppData%\INS Manager\diagnostics`.
+
+The full Microsoft Flight Simulator SDK is optional for building this project. Install it from **MSFS 2024 DevMode → Help → SDK Installer** when the SimConnect Inspector or official samples are needed.

@@ -86,7 +86,9 @@ public partial class MainViewModel : ObservableObject
     {
         ConnectionStatus = "Connecting…";
         IsConnected = await _simulatorConnection.ConnectAsync();
-        ConnectionStatus = IsConnected ? "Mock simulator connected" : "Connection failed";
+        ConnectionStatus = IsConnected
+            ? $"MSFS 2024 connected · {_simulatorConnection.InputEventCount} controls"
+            : _simulatorConnection.LastError ?? "Connection failed";
     }
 
     [RelayCommand]

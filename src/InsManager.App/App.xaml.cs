@@ -18,7 +18,7 @@ public partial class App : Application
             services.AddSingleton(new HttpClient { Timeout = TimeSpan.FromSeconds(20) });
             services.AddSingleton<IRouteProvider, SimBriefRouteProvider>();
             services.AddSingleton<ISettingsService, JsonSettingsService>();
-            services.AddSingleton<ISimulatorConnection, MockSimulatorConnection>();
+            services.AddSingleton<ISimulatorConnection, SimConnectConnection>();
             services.AddSingleton<ThemeService>();
             services.AddSingleton<MainViewModel>();
             services.AddSingleton<MainWindow>();
