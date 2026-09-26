@@ -7,9 +7,9 @@ on:
   workflow_dispatch:
     inputs:
       version:
-        description: Version to build (for example 0.1.0-beta.1)
+        description: Version to build (for example 1.0.0)
         required: true
-        default: 0.1.0
+        default: 1.0.0
 
 permissions:
   contents: write
