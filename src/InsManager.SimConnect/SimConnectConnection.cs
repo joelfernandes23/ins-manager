@@ -1,4 +1,5 @@
 using InsManager.Core.Services;
+using InsManager.Core.Models;
 using SimConnect.NET;
 using SimConnect.NET.Events;
 
@@ -10,6 +11,8 @@ public sealed class SimConnectConnection : ISimulatorConnection, IAsyncDisposabl
     private SimConnectClient? _client;
     private CancellationTokenSource? _messageLoopCancellation;
     private Task? _messageLoop;
+    private CancellationTokenSource? _driftCorrectionCancellation;
+    private Task? _driftCorrectionLoop;
 
     public bool IsConnected => _client?.IsConnected == true;
     public bool IsMsfs2024 => _client?.IsMSFS2024 == true;
@@ -98,8 +101,99 @@ public sealed class SimConnectConnection : ISimulatorConnection, IAsyncDisposabl
         }
     }
 
+    public async Task SendWaypointAsync(
+        int slot,
+        Waypoint waypoint,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentOutOfRangeException.ThrowIfLessThan(slot, 1);
+        ArgumentOutOfRangeException.ThrowIfGreaterThan(slot, 9);
+        ArgumentNullException.ThrowIfNull(waypoint);
+
+        var client = GetConnectedClient();
+        await client.SimVars.SetAsync($"L:FSS_B727_CIVA_WP_{slot}_LAT", "Number", waypoint.Latitude, cancellationToken: cancellationToken);
+        await client.SimVars.SetAsync($"L:FSS_B727_CIVA_WP_{slot}_LON", "Number", waypoint.Longitude, cancellationToken: cancellationToken);
+    }
+
+    public async Task SetDirectToAsync(
+        int fromSlot,
+        int toSlot,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentOutOfRangeException.ThrowIfLessThan(fromSlot, 0);
+        ArgumentOutOfRangeException.ThrowIfGreaterThan(fromSlot, 9);
+        ArgumentOutOfRangeException.ThrowIfLessThan(toSlot, 1);
+        ArgumentOutOfRangeException.ThrowIfGreaterThan(toSlot, 9);
+
+        var client = GetConnectedClient();
+        await client.SimVars.SetAsync("L:FSS_B727_CIVA_FROM", "Number", (double)fromSlot, cancellationToken: cancellationToken);
+        await client.SimVars.SetAsync("L:FSS_B727_CIVA_TO", "Number", (double)toSlot, cancellationToken: cancellationToken);
+    }
+
+    public async Task ResetDriftAsync(CancellationToken cancellationToken = default)
+    {
+        var client = GetConnectedClient();
+        var latitude = await client.SimVars.GetAsync<double>(
+            "L:FSS_B727_CIVA_SIM_LAT",
+            "Number",
+            cancellationToken: cancellationToken);
+        var longitude = await client.SimVars.GetAsync<double>(
+            "L:FSS_B727_CIVA_SIM_LON",
+            "Number",
+            cancellationToken: cancellationToken);
+        await client.SimVars.SetAsync("L:FSS_B727_CIVA_POS_LAT", "Number", latitude, cancellationToken: cancellationToken);
+        await client.SimVars.SetAsync("L:FSS_B727_CIVA_POS_LON", "Number", longitude, cancellationToken: cancellationToken);
+    }
+
+    public async Task SetDriftCorrectionEnabledAsync(
+        bool enabled,
+        CancellationToken cancellationToken = default)
+    {
+        await StopDriftCorrectionAsync();
+        if (!enabled) return;
+
+        GetConnectedClient();
+        _driftCorrectionCancellation = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+        _driftCorrectionLoop = CorrectDriftAsync(_driftCorrectionCancellation.Token);
+    }
+
+    private async Task CorrectDriftAsync(CancellationToken cancellationToken)
+    {
+        using var timer = new PeriodicTimer(TimeSpan.FromSeconds(5));
+        try
+        {
+            do
+            {
+                await ResetDriftAsync(cancellationToken);
+            }
+            while (await timer.WaitForNextTickAsync(cancellationToken));
+        }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+        {
+        }
+        catch (Exception exception) when (exception is SimConnectException or InvalidOperationException)
+        {
+            LastError = $"Drift correction stopped: {exception.Message}";
+        }
+    }
+
+    private async Task StopDriftCorrectionAsync()
+    {
+        _driftCorrectionCancellation?.Cancel();
+        if (_driftCorrectionLoop is not null) await _driftCorrectionLoop;
+        _driftCorrectionCancellation?.Dispose();
+        _driftCorrectionCancellation = null;
+        _driftCorrectionLoop = null;
+    }
+
+    private SimConnectClient GetConnectedClient() =>
+        _client is { IsConnected: true } client
+            ? client
+            : throw new InvalidOperationException("MSFS 2024 is not connected.");
+
     private async Task DisconnectCoreAsync()
     {
+        await StopDriftCorrectionAsync();
         _messageLoopCancellation?.Cancel();
         if (_messageLoop is not null)
         {

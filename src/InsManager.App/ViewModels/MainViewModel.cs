@@ -69,6 +69,24 @@ public partial class MainViewModel : ObservableObject
 
     partial void OnSelectedThemeChanged(string value) => _themeService.Apply(value);
 
+    partial void OnCorrectDriftChanged(bool value)
+    {
+        if (IsConnected) _ = UpdateDriftCorrectionAsync(value);
+    }
+
+    private async Task UpdateDriftCorrectionAsync(bool enabled)
+    {
+        try
+        {
+            await _simulatorConnection.SetDriftCorrectionEnabledAsync(enabled);
+            RouteStatus = enabled ? "Drift correction enabled" : "Drift correction disabled";
+        }
+        catch (Exception exception)
+        {
+            RouteStatus = $"Drift correction failed: {exception.Message}";
+        }
+    }
+
     [RelayCommand]
     private void OpenSettings() => IsSettingsOpen = true;
 
@@ -88,6 +106,7 @@ public partial class MainViewModel : ObservableObject
         if (IsConnected)
         {
             ConnectionStatus = "Disconnecting…";
+            await _simulatorConnection.SetDriftCorrectionEnabledAsync(false);
             await _simulatorConnection.DisconnectAsync();
             IsConnected = false;
             ConnectionAction = "Connect";
@@ -97,6 +116,10 @@ public partial class MainViewModel : ObservableObject
 
         ConnectionStatus = "Connecting…";
         IsConnected = await _simulatorConnection.ConnectAsync();
+        if (IsConnected && CorrectDrift)
+        {
+            await _simulatorConnection.SetDriftCorrectionEnabledAsync(true);
+        }
         ConnectionAction = IsConnected ? "Disconnect" : "Connect";
         ConnectionStatus = IsConnected
             ? "MSFS 2024 connected"
@@ -152,16 +175,34 @@ public partial class MainViewModel : ObservableObject
     }
 
     [RelayCommand]
-    private void ConfirmSend()
+    private async Task ConfirmSendAsync()
     {
         if (SelectedFlightPlanLeg is null) return;
 
-        var routeIndex = FlightPlan.IndexOf(SelectedFlightPlanLeg);
-        if (AutoManageWaypoints) ResyncSlots(routeIndex, SelectedInsSlot);
-        else SetSlot(SelectedInsSlot, SelectedFlightPlanLeg.Waypoint, "Loaded");
+        if (!IsConnected)
+        {
+            RouteStatus = "Connect to MSFS 2024 before sending a waypoint.";
+            return;
+        }
 
-        RouteStatus = $"{SelectedFlightPlanLeg.Waypoint.Identifier} sent to INS slot {SelectedInsSlot}";
-        IsSendDialogOpen = false;
+        var routeIndex = FlightPlan.IndexOf(SelectedFlightPlanLeg);
+        try
+        {
+            if (CorrectDrift) await _simulatorConnection.ResetDriftAsync();
+            if (AutoManageWaypoints) await ResyncSlotsAsync(routeIndex, SelectedInsSlot);
+            else
+            {
+                await _simulatorConnection.SendWaypointAsync(SelectedInsSlot, SelectedFlightPlanLeg.Waypoint);
+                SetSlot(SelectedInsSlot, SelectedFlightPlanLeg.Waypoint, "Loaded");
+            }
+
+            RouteStatus = $"{SelectedFlightPlanLeg.Waypoint.Identifier} sent to INS slot {SelectedInsSlot}";
+            IsSendDialogOpen = false;
+        }
+        catch (Exception exception)
+        {
+            RouteStatus = $"Waypoint send failed: {exception.Message}";
+        }
     }
 
     [RelayCommand]
@@ -176,7 +217,7 @@ public partial class MainViewModel : ObservableObject
     }
 
     [RelayCommand]
-    private void ConfirmDirect()
+    private async Task ConfirmDirectAsync()
     {
         if (SelectedFlightPlanLeg is null) return;
 
@@ -184,14 +225,33 @@ public partial class MainViewModel : ObservableObject
         var targetSlot = loadedSlot?.Number ?? (int.TryParse(ToSlot, out var currentTo) && currentTo is >= 1 and <= 9 ? currentTo : 1);
         var routeIndex = FlightPlan.IndexOf(SelectedFlightPlanLeg);
 
-        if (AutoManageWaypoints) ResyncSlots(routeIndex, targetSlot);
-        else SetSlot(targetSlot, SelectedFlightPlanLeg.Waypoint, "Direct");
+        if (!IsConnected)
+        {
+            RouteStatus = "Connect to MSFS 2024 before selecting direct-to.";
+            return;
+        }
 
-        FromSlot = "0";
-        ToSlot = targetSlot.ToString();
-        Accuracy = "1";
-        RouteStatus = $"Direct to {SelectedFlightPlanLeg.Waypoint.Identifier} via INS slot {targetSlot}";
-        IsDirectDialogOpen = false;
+        try
+        {
+            if (CorrectDrift) await _simulatorConnection.ResetDriftAsync();
+            if (AutoManageWaypoints) await ResyncSlotsAsync(routeIndex, targetSlot);
+            else
+            {
+                await _simulatorConnection.SendWaypointAsync(targetSlot, SelectedFlightPlanLeg.Waypoint);
+                SetSlot(targetSlot, SelectedFlightPlanLeg.Waypoint, "Direct");
+            }
+
+            await _simulatorConnection.SetDirectToAsync(0, targetSlot);
+            FromSlot = "0";
+            ToSlot = targetSlot.ToString();
+            Accuracy = "1";
+            RouteStatus = $"Direct to {SelectedFlightPlanLeg.Waypoint.Identifier} via INS slot {targetSlot}";
+            IsDirectDialogOpen = false;
+        }
+        catch (Exception exception)
+        {
+            RouteStatus = $"Direct-to failed: {exception.Message}";
+        }
     }
 
     [RelayCommand]
@@ -210,6 +270,18 @@ public partial class MainViewModel : ObservableObject
             var slotNumber = ((startingSlot - 1 + offset) % 9) + 1;
             var waypointIndex = routeIndex + offset;
             var waypoint = waypointIndex < FlightPlan.Count ? FlightPlan[waypointIndex].Waypoint : null;
+            SetSlot(slotNumber, waypoint, waypoint is null ? "Empty" : "Synced");
+        }
+    }
+
+    private async Task ResyncSlotsAsync(int routeIndex, int startingSlot)
+    {
+        for (var offset = 0; offset < 9; offset++)
+        {
+            var slotNumber = ((startingSlot - 1 + offset) % 9) + 1;
+            var waypointIndex = routeIndex + offset;
+            var waypoint = waypointIndex < FlightPlan.Count ? FlightPlan[waypointIndex].Waypoint : null;
+            if (waypoint is not null) await _simulatorConnection.SendWaypointAsync(slotNumber, waypoint);
             SetSlot(slotNumber, waypoint, waypoint is null ? "Empty" : "Synced");
         }
     }

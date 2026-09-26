@@ -1,7 +1,10 @@
 param(
     [Parameter(Position = 0)]
     [ValidateSet('setup', 'run', 'scan', 'build', 'test', 'format', 'check')]
-    [string]$Task = 'run'
+    [string]$Task = 'run',
+
+    [Parameter(ValueFromRemainingArguments)]
+    [string[]]$Arguments = @()
 )
 
 $ErrorActionPreference = 'Stop'
@@ -28,7 +31,7 @@ switch ($Task) {
         Invoke-DotNet run --project $app
     }
     'scan' {
-        Invoke-DotNet run --project $diagnostics -- @args
+        Invoke-DotNet run --project $diagnostics -- @Arguments
     }
     'build' {
         Invoke-DotNet build $solution --configuration Release

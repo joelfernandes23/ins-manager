@@ -4,9 +4,7 @@ A Windows desktop utility for managing classic inertial navigation systems in Mi
 
 ## Status
 
-The application currently supports the FlightSim Studio Boeing 727 in Microsoft Flight Simulator 2024. It downloads real flight plans from SimBrief and connects to the simulator through SimConnect.
-
-Waypoint writes remain disabled until the FSS 727 input-event mapping has been verified.
+The application currently supports the FlightSim Studio Boeing 727 in Microsoft Flight Simulator 2024. It downloads real flight plans from SimBrief, writes waypoint coordinates directly to the aircraft CIVA slots, supports direct-to selection, and can continuously correct INS position drift.
 
 ## Architecture
 
@@ -49,5 +47,7 @@ The repository uses pre-commit for whitespace, YAML, merge-conflict, and .NET fo
 Start MSFS 2024, load the FSS Boeing 727 into a flight, then select **Connect** in INS Manager.
 
 Run `.\dev.ps1 scan` with the aircraft loaded to export matching CIVA/INS input events to `input-events.json`. Optional search terms can be supplied after `scan`.
+
+Use `.\dev.ps1 scan --civa-state` for a read-only dump of the live CIVA position and waypoint slots. `.\dev.ps1 scan --write-self-test` temporarily verifies slot 9 and restores its original values.
 
 The full Microsoft Flight Simulator SDK is optional for building this project. Install it from **MSFS 2024 DevMode → Help → SDK Installer** when the SimConnect Inspector or official samples are needed.

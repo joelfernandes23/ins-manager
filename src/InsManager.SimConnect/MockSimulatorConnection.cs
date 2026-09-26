@@ -2,6 +2,8 @@ using InsManager.Core.Services;
 
 namespace InsManager.SimConnect;
 
+using InsManager.Core.Models;
+
 public sealed class MockSimulatorConnection : ISimulatorConnection
 {
     public bool IsConnected { get; private set; }
@@ -22,4 +24,15 @@ public sealed class MockSimulatorConnection : ISimulatorConnection
         IsConnected = false;
         return Task.CompletedTask;
     }
+
+    public Task SendWaypointAsync(int slot, Waypoint waypoint, CancellationToken cancellationToken = default) =>
+        Task.CompletedTask;
+
+    public Task SetDirectToAsync(int fromSlot, int toSlot, CancellationToken cancellationToken = default) =>
+        Task.CompletedTask;
+
+    public Task ResetDriftAsync(CancellationToken cancellationToken = default) => Task.CompletedTask;
+
+    public Task SetDriftCorrectionEnabledAsync(bool enabled, CancellationToken cancellationToken = default) =>
+        Task.CompletedTask;
 }
