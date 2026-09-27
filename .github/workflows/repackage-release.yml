@@ -1,0 +1,62 @@
+name: Repackage Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Existing release tag to rebuild, for example v1.0.1
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  package:
+    runs-on: windows-latest
+
+    steps:
+      - name: Validate tag
+        id: release
+        shell: pwsh
+        env:
+          RELEASE_TAG: ${{ inputs.tag }}
+        run: |
+          $tag = $env:RELEASE_TAG
+          if ($tag -notmatch '^v(\d+\.\d+\.\d+(?:[-.][0-9A-Za-z.-]+)?)$') {
+            throw "Expected a version tag such as v1.0.1; received '$tag'."
+          }
+          "version=$($Matches[1])" >> $env:GITHUB_OUTPUT
+
+      - name: Check out release tag
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ inputs.tag }}
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v6
+        with:
+          global-json-file: global.json
+          cache: true
+          cache-dependency-path: '**/*.csproj'
+
+      - name: Restore
+        run: dotnet restore InsManager.sln
+
+      - name: Test
+        run: dotnet test InsManager.sln --configuration Release --no-restore
+
+      - name: Package
+        shell: pwsh
+        run: .\scripts\package.ps1 '${{ steps.release.outputs.version }}'
+
+      - name: Replace release assets
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RELEASE_TAG: ${{ inputs.tag }}
+        run: |
+          $assets = Get-ChildItem artifacts/release -File |
+            Where-Object Extension -In '.zip', '.sha256' |
+            ForEach-Object FullName
+          gh release upload $env:RELEASE_TAG @assets --clobber

@@ -1,11 +1,12 @@
 # Changelog
 
-## [1.0.1](https://github.com/joelfernandes23/ins-manager/compare/v1.0.0...v1.0.1) (2026-09-26)
+## [1.0.1](https://github.com/joelfernandes23/ins-manager/compare/v1.0.0...v1.0.1) (2026-09-27)
 
 
 ### Bug Fixes
 
-* stop guessing simulator version ([b83b0ff](https://github.com/joelfernandes23/ins-manager/commit/b83b0ff7b9b7e730fbf822c44f41a9fde9601220))
+* show a reliable, simulator-neutral connection status ([b83b0ff](https://github.com/joelfernandes23/ins-manager/commit/b83b0ff7b9b7e730fbf822c44f41a9fde9601220))
+* finish shutting down SimConnect before the app exits ([6c445fe](https://github.com/joelfernandes23/ins-manager/commit/6c445fe59255da908263560e1f316ab08b2bb95f))
 
 ## 1.0.0 (2026-09-26)
 
