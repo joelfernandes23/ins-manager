@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.0.1](https://github.com/joelfernandes23/ins-manager/compare/v1.0.0...v1.0.1) (2026-09-28)
+
+
+### Bug Fixes
+
+* complete shutdown before process exit ([6c445fe](https://github.com/joelfernandes23/ins-manager/commit/6c445fe59255da908263560e1f316ab08b2bb95f))
+* stop guessing simulator version ([b83b0ff](https://github.com/joelfernandes23/ins-manager/commit/b83b0ff7b9b7e730fbf822c44f41a9fde9601220))
+
 ## 1.0.0 (2026-09-26)
 
 
