@@ -3,21 +3,21 @@
 ## Requirements
 
 - Microsoft Flight Simulator 2024
-- FlightSim Studio Boeing 727
+- A supported aircraft and INS integration
 - A generated SimBrief flight plan
 - Your SimBrief Pilot ID
 
 INS Manager officially supports MSFS 2024. MSFS 2020 may work but is not tested.
 
-![INS Manager connected to the FSS 727 with a loaded route](images/ins-manager-flight.png)
+![INS Manager connected to Microsoft Flight Simulator with a loaded route](images/ins-manager-flight.png)
 
 ## Start a flight
 
-1. Start MSFS and load the FSS 727 into a flight.
+1. Start MSFS and load a supported aircraft into a flight.
 2. Open INS Manager.
 3. Open Settings.
 4. Enter your SimBrief Pilot ID.
-5. Select the FSS Boeing 727.
+5. Select the aircraft profile.
 6. Choose a theme and drift correction interval.
 7. Save the settings.
 8. Select **Connect**.
@@ -61,7 +61,7 @@ The correction runs when the app connects and then at the selected interval:
 - 30 minutes
 - 60 minutes
 
-The displayed accuracy index comes from the aircraft. Correcting the position does not replace the FSS accuracy model.
+The displayed accuracy index comes from the aircraft. Correcting the position does not replace the aircraft's accuracy model.
 
 ## Coordinate format
 
@@ -85,7 +85,7 @@ Closing the window stops the SimConnect connection and exits the process. If INS
 
 ### Connection fails
 
-Confirm that MSFS is running and the FSS 727 is loaded into a flight. Then select **Connect** again.
+Confirm that MSFS is running and a supported aircraft is loaded into a flight. Then select **Connect** again.
 
 ### SimBrief download fails
 
@@ -97,4 +97,4 @@ Wait five seconds for the next aircraft slot refresh. A manually entered coordin
 
 ### FROM and TO do not update
 
-Disconnect and reconnect the app. If the aircraft values still differ, report the displayed values and FSS 727 version in a GitHub issue.
+Disconnect and reconnect the app. If the aircraft values still differ, report the displayed values and aircraft version in a GitHub issue.
