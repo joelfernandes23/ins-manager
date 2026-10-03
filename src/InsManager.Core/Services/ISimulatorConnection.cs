@@ -13,6 +13,9 @@ public interface ISimulatorConnection
     Task DisconnectAsync(CancellationToken cancellationToken = default);
     Task SendWaypointAsync(int slot, Waypoint waypoint, CancellationToken cancellationToken = default);
     Task SetDirectToAsync(int fromSlot, int toSlot, CancellationToken cancellationToken = default);
+    Task<InsState> GetInsStateAsync(CancellationToken cancellationToken = default);
+    Task<IReadOnlyList<InsWaypointCoordinates>> GetInsWaypointsAsync(
+        CancellationToken cancellationToken = default);
     Task ResetDriftAsync(CancellationToken cancellationToken = default);
     Task SetDriftCorrectionEnabledAsync(
         bool enabled,

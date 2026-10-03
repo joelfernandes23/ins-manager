@@ -30,6 +30,13 @@ public sealed class MockSimulatorConnection : ISimulatorConnection
     public Task SetDirectToAsync(int fromSlot, int toSlot, CancellationToken cancellationToken = default) =>
         Task.CompletedTask;
 
+    public Task<InsState> GetInsStateAsync(CancellationToken cancellationToken = default) =>
+        Task.FromResult(new InsState(0, 1, 0));
+
+    public Task<IReadOnlyList<InsWaypointCoordinates>> GetInsWaypointsAsync(
+        CancellationToken cancellationToken = default) =>
+        Task.FromResult<IReadOnlyList<InsWaypointCoordinates>>([]);
+
     public Task ResetDriftAsync(CancellationToken cancellationToken = default) => Task.CompletedTask;
 
     public Task SetDriftCorrectionEnabledAsync(

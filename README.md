@@ -1,15 +1,16 @@
 # INS Manager
 
-INS Manager is a small Windows utility for the classic inertial navigation systems found in Microsoft Flight Simulator aircraft.
+INS Manager is a Windows utility for classic inertial navigation systems in Microsoft Flight Simulator aircraft.
 
-The first release officially supports the FlightSim Studio Boeing 727 in Microsoft Flight Simulator 2024. Support for other aircraft may follow once the 727 integration has earned its keep.
+![INS Manager connected to Microsoft Flight Simulator with a loaded SimBrief route](docs/images/ins-manager-main.png)
 
 ## What it does
 
 - Downloads the latest flight plan from SimBrief
 - Lists every waypoint with its coordinates, track, and distance
 - Sends waypoints to any of the nine CIVA slots
-- Resynchronises upcoming slots when automatic waypoint management is enabled
+- Reads FROM, TO, accuracy, and waypoint slots from the aircraft
+- Refills available slots when automatic waypoint management is enabled
 - Selects a direct-to waypoint after confirmation
 - Corrects simulated INS drift every 10, 30, or 60 minutes
 - Supports light and dark themes
@@ -18,7 +19,7 @@ The first release officially supports the FlightSim Studio Boeing 727 in Microso
 
 - Windows 10 or Windows 11
 - Microsoft Flight Simulator 2024
-- FlightSim Studio Boeing 727
+- A supported aircraft and INS integration
 - A SimBrief account
 
 The release package includes the .NET runtime. There is no separate runtime to install and nothing belongs in the Community folder.
@@ -29,10 +30,12 @@ The release package includes the .NET runtime. There is no separate runtime to i
 2. Extract the ZIP to a normal folder.
 3. Run `INSManager.exe`.
 4. Open Settings, enter your SimBrief Pilot ID, and save.
-5. Start MSFS 2024, load the FSS 727 into a flight, then select **Connect**.
+5. Start MSFS 2024, load a supported aircraft into a flight, then select **Connect**.
 6. Select the download button to load the current SimBrief flight plan.
 
 Settings are stored for the current Windows user.
+
+See the [user guide](docs/user-guide.md) for waypoint loading, automatic slot management, direct-to, and drift correction.
 
 Windows may show a SmartScreen warning because the executable is not currently signed with a commercial code-signing certificate. The release includes a SHA-256 checksum for anyone inclined to check the arithmetic.
 
@@ -42,7 +45,7 @@ INS Manager does not include telemetry or analytics. It stores its settings in t
 
 ## Support
 
-Use [GitHub Issues](https://github.com/joelfernandes23/ins-manager/issues) for bugs and compatibility reports. Include the simulator version, FSS 727 version, the action you attempted, and the full error message. Reports that merely say it broke will be admired for their economy and little else.
+Use [GitHub Issues](https://github.com/joelfernandes23/ins-manager/issues) for bugs and compatibility reports. Include the simulator version, aircraft and add-on version, the action you attempted, and the full error message.
 
 ## Development
 

@@ -13,6 +13,7 @@ namespace InsManager.App;
 
 public partial class App : Application
 {
+    private const string SingleInstanceMutexName = @"Local\INSManager-2E255286-7D82-40D9-A267-160F5BC74B21";
     private readonly IHost _host = Host.CreateDefaultBuilder()
         .ConfigureServices(services =>
         {
@@ -25,6 +26,8 @@ public partial class App : Application
             services.AddSingleton<MainWindow>();
         })
         .Build();
+    private Mutex? _singleInstanceMutex;
+    private bool _ownsSingleInstanceMutex;
 
     public App()
     {
@@ -33,6 +36,18 @@ public partial class App : Application
 
     protected override async void OnStartup(StartupEventArgs e)
     {
+        _singleInstanceMutex = new Mutex(true, SingleInstanceMutexName, out _ownsSingleInstanceMutex);
+        if (!_ownsSingleInstanceMutex)
+        {
+            MessageBox.Show(
+                "INS Manager is already running.",
+                "INS Manager",
+                MessageBoxButton.OK,
+                MessageBoxImage.Warning);
+            Shutdown();
+            return;
+        }
+
         try
         {
             await _host.StartAsync();
@@ -65,6 +80,13 @@ public partial class App : Application
         }
         finally
         {
+            if (_ownsSingleInstanceMutex)
+            {
+                _singleInstanceMutex?.ReleaseMutex();
+                _ownsSingleInstanceMutex = false;
+            }
+            _singleInstanceMutex?.Dispose();
+            _singleInstanceMutex = null;
             base.OnExit(e);
         }
     }

@@ -129,17 +129,60 @@ public sealed class SimConnectConnection : ISimulatorConnection, IAsyncDisposabl
         await client.SimVars.SetAsync("L:FSS_B727_CIVA_TO", "Number", (double)toSlot, cancellationToken: cancellationToken);
     }
 
+    public async Task<InsState> GetInsStateAsync(CancellationToken cancellationToken = default)
+    {
+        var client = GetConnectedClient();
+        var fromSlot = await client.SimVars.GetAsync<double>(
+            "L:FSS_B727_CIVA_FROM",
+            "Number",
+            cancellationToken: cancellationToken);
+        var toSlot = await client.SimVars.GetAsync<double>(
+            "L:FSS_B727_CIVA_TO",
+            "Number",
+            cancellationToken: cancellationToken);
+        var accuracyIndex = await client.SimVars.GetAsync<double>(
+            "L:FSS_B727_CIVA_ACC_INDEX",
+            "Number",
+            cancellationToken: cancellationToken);
+
+        return new InsState((int)Math.Round(fromSlot), (int)Math.Round(toSlot), accuracyIndex);
+    }
+
+    public async Task<IReadOnlyList<InsWaypointCoordinates>> GetInsWaypointsAsync(
+        CancellationToken cancellationToken = default)
+    {
+        var client = GetConnectedClient();
+        var waypoints = new List<InsWaypointCoordinates>(9);
+
+        for (var slot = 1; slot <= 9; slot++)
+        {
+            var latitude = await client.SimVars.GetAsync<double>(
+                $"L:FSS_B727_CIVA_WP_{slot}_LAT",
+                "Number",
+                cancellationToken: cancellationToken);
+            var longitude = await client.SimVars.GetAsync<double>(
+                $"L:FSS_B727_CIVA_WP_{slot}_LON",
+                "Number",
+                cancellationToken: cancellationToken);
+            waypoints.Add(new InsWaypointCoordinates(slot, latitude, longitude));
+        }
+
+        return waypoints;
+    }
+
     public async Task ResetDriftAsync(CancellationToken cancellationToken = default)
     {
         var client = GetConnectedClient();
         var latitude = await client.SimVars.GetAsync<double>(
-            "L:FSS_B727_CIVA_SIM_LAT",
-            "Number",
+            "PLANE LATITUDE",
+            "Degrees",
             cancellationToken: cancellationToken);
         var longitude = await client.SimVars.GetAsync<double>(
-            "L:FSS_B727_CIVA_SIM_LON",
-            "Number",
+            "PLANE LONGITUDE",
+            "Degrees",
             cancellationToken: cancellationToken);
+        await client.SimVars.SetAsync("L:FSS_B727_CIVA_SIM_LAT", "Number", latitude, cancellationToken: cancellationToken);
+        await client.SimVars.SetAsync("L:FSS_B727_CIVA_SIM_LON", "Number", longitude, cancellationToken: cancellationToken);
         await client.SimVars.SetAsync("L:FSS_B727_CIVA_POS_LAT", "Number", latitude, cancellationToken: cancellationToken);
         await client.SimVars.SetAsync("L:FSS_B727_CIVA_POS_LON", "Number", longitude, cancellationToken: cancellationToken);
     }

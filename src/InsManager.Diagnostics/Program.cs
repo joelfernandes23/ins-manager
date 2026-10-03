@@ -154,19 +154,22 @@ static async Task<string> TryReadAsync(
 
 static async Task PrintCivaStateAsync(SimConnectClient client, CancellationToken cancellationToken)
 {
-    async Task<double> ReadAsync(string name) => await PumpUntilCompleteAsync(
+    async Task<double> ReadAsync(string name, string unit = "Number") => await PumpUntilCompleteAsync(
         client,
-        client.SimVars.GetAsync<double>(name, "Number", cancellationToken: cancellationToken),
+        client.SimVars.GetAsync<double>(name, unit, cancellationToken: cancellationToken),
         cancellationToken);
 
     var state = new Dictionary<string, double>
     {
         ["SIM_LAT"] = await ReadAsync("L:FSS_B727_CIVA_SIM_LAT"),
         ["SIM_LON"] = await ReadAsync("L:FSS_B727_CIVA_SIM_LON"),
+        ["PLANE_LAT"] = await ReadAsync("PLANE LATITUDE", "Degrees"),
+        ["PLANE_LON"] = await ReadAsync("PLANE LONGITUDE", "Degrees"),
         ["POS_LAT"] = await ReadAsync("L:FSS_B727_CIVA_POS_LAT"),
         ["POS_LON"] = await ReadAsync("L:FSS_B727_CIVA_POS_LON"),
         ["FROM"] = await ReadAsync("L:FSS_B727_CIVA_FROM"),
         ["TO"] = await ReadAsync("L:FSS_B727_CIVA_TO"),
+        ["ACC_INDEX"] = await ReadAsync("L:FSS_B727_CIVA_ACC_INDEX"),
     };
 
     for (var slot = 1; slot <= 9; slot++)
