@@ -2,7 +2,7 @@
 
 INS Manager is a Windows utility for classic inertial navigation systems in Microsoft Flight Simulator aircraft.
 
-![INS Manager connected to Microsoft Flight Simulator with a loaded SimBrief route](docs/images/ins-manager-flight.png)
+![INS Manager connected to Microsoft Flight Simulator with a loaded SimBrief route](docs/images/ins-manager-main.png)
 
 ## What it does
 
