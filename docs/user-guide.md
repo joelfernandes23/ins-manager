@@ -9,6 +9,8 @@
 
 INS Manager officially supports MSFS 2024. MSFS 2020 may work but is not tested.
 
+![INS Manager connected to the FSS 727 with a loaded route](images/ins-manager-flight.png)
+
 ## Start a flight
 
 1. Start MSFS and load the FSS 727 into a flight.
