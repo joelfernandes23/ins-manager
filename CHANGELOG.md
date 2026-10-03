@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.0](https://github.com/joelfernandes23/ins-manager/compare/v1.0.1...v1.1.0) (2026-10-03)
+
+
+### Features
+
+* synchronize live INS state ([#12](https://github.com/joelfernandes23/ins-manager/issues/12)) ([19bf8a2](https://github.com/joelfernandes23/ins-manager/commit/19bf8a2bd7edff5f32bda35acfd7c35561b61fcf))
+
 ## [1.0.1](https://github.com/joelfernandes23/ins-manager/compare/v1.0.0...v1.0.1) (2026-09-28)
 
 
