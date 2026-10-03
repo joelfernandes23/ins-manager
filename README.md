@@ -9,7 +9,8 @@ The first release officially supports the FlightSim Studio Boeing 727 in Microso
 - Downloads the latest flight plan from SimBrief
 - Lists every waypoint with its coordinates, track, and distance
 - Sends waypoints to any of the nine CIVA slots
-- Resynchronises upcoming slots when automatic waypoint management is enabled
+- Reads FROM, TO, accuracy, and waypoint slots from the aircraft
+- Refills available slots when automatic waypoint management is enabled
 - Selects a direct-to waypoint after confirmation
 - Corrects simulated INS drift every 10, 30, or 60 minutes
 - Supports light and dark themes
@@ -33,6 +34,8 @@ The release package includes the .NET runtime. There is no separate runtime to i
 6. Select the download button to load the current SimBrief flight plan.
 
 Settings are stored for the current Windows user.
+
+See the [user guide](docs/user-guide.md) for waypoint loading, automatic slot management, direct-to, and drift correction.
 
 Windows may show a SmartScreen warning because the executable is not currently signed with a commercial code-signing certificate. The release includes a SHA-256 checksum for anyone inclined to check the arithmetic.
 
