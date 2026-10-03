@@ -53,10 +53,29 @@ public static class RouteCalculator
 
     private static string FormatCoordinates(Waypoint waypoint)
     {
-        var latitudeHemisphere = waypoint.Latitude >= 0 ? "N" : "S";
-        var longitudeHemisphere = waypoint.Longitude >= 0 ? "E" : "W";
-        return $"{latitudeHemisphere}{Math.Abs(waypoint.Latitude):00.0000} "
-            + $"{longitudeHemisphere}{Math.Abs(waypoint.Longitude):000.0000}";
+        var latitude = FormatCoordinate(waypoint.Latitude, "N", "S", 2);
+        var longitude = FormatCoordinate(waypoint.Longitude, "E", "W", 3);
+        return $"{latitude} {longitude}";
+    }
+
+    private static string FormatCoordinate(
+        double value,
+        string positiveHemisphere,
+        string negativeHemisphere,
+        int degreeDigits)
+    {
+        var hemisphere = value >= 0 ? positiveHemisphere : negativeHemisphere;
+        var absoluteValue = Math.Abs(value);
+        var degrees = (int)Math.Floor(absoluteValue);
+        var minutes = Math.Round((absoluteValue - degrees) * 60, 1);
+
+        if (minutes >= 60)
+        {
+            degrees++;
+            minutes = 0;
+        }
+
+        return $"{hemisphere}{degrees.ToString().PadLeft(degreeDigits, '0')}{minutes:00.0}";
     }
 
     private static double DegreesToRadians(double degrees) => degrees * Math.PI / 180;
