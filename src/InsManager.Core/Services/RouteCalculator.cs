@@ -16,7 +16,7 @@ public static class RouteCalculator
             var track = waypoint.TrackDegrees
                 ?? (hasPrevious ? InitialBearing(waypoints[index - 1], waypoint) : null);
             var distance = waypoint.DistanceNauticalMiles
-                ?? (hasPrevious ? Distance(waypoints[index - 1], waypoint) : null);
+                ?? (hasPrevious ? DistanceNauticalMiles(waypoints[index - 1], waypoint) : null);
 
             legs.Add(new FlightPlanLeg(
                 index + 1,
@@ -29,7 +29,7 @@ public static class RouteCalculator
         return legs;
     }
 
-    private static double Distance(Waypoint from, Waypoint to)
+    public static double DistanceNauticalMiles(Waypoint from, Waypoint to)
     {
         var latitude1 = DegreesToRadians(from.Latitude);
         var latitude2 = DegreesToRadians(to.Latitude);

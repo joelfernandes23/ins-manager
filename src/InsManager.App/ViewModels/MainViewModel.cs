@@ -1,6 +1,7 @@
 using System.Collections.ObjectModel;
 using System.Net.Http;
 using System.Text.Json;
+using System.Windows.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using InsManager.App.Services;
@@ -15,6 +16,11 @@ public partial class MainViewModel : ObservableObject
     private readonly ISettingsService _settingsService;
     private readonly ISimulatorConnection _simulatorConnection;
     private readonly ThemeService _themeService;
+    private readonly DispatcherTimer _insStateTimer;
+    private bool _isRefreshingInsState;
+    private int? _lastObservedFromSlot;
+    private int? _lastObservedToSlot;
+    private DateTimeOffset _lastSlotRefresh = DateTimeOffset.MinValue;
 
     [ObservableProperty] private string _connectionStatus = "Simulator disconnected";
     [ObservableProperty] private string _connectionAction = "Connect";
@@ -49,6 +55,8 @@ public partial class MainViewModel : ObservableObject
         _simulatorConnection = simulatorConnection;
         _themeService = themeService;
         _selectedDriftInterval = DriftIntervals[1];
+        _insStateTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(1) };
+        _insStateTimer.Tick += RefreshInsState;
         ResetSlots();
     }
 
@@ -82,6 +90,15 @@ public partial class MainViewModel : ObservableObject
     partial void OnCorrectDriftChanged(bool value)
     {
         if (IsConnected) _ = UpdateDriftCorrectionAsync(value);
+    }
+
+    partial void OnAutoManageWaypointsChanged(bool value)
+    {
+        if (value)
+        {
+            _lastObservedFromSlot = null;
+            _lastObservedToSlot = null;
+        }
     }
 
     partial void OnSelectedDriftIntervalChanged(DriftIntervalOption value)
@@ -129,6 +146,7 @@ public partial class MainViewModel : ObservableObject
         if (IsConnected)
         {
             ConnectionStatus = "Disconnecting…";
+            _insStateTimer.Stop();
             await _simulatorConnection.SetDriftCorrectionEnabledAsync(
                 false,
                 TimeSpan.FromMinutes(SelectedDriftInterval.Minutes));
@@ -140,6 +158,8 @@ public partial class MainViewModel : ObservableObject
         }
 
         ConnectionStatus = "Connecting…";
+        _lastObservedFromSlot = null;
+        _lastObservedToSlot = null;
         IsConnected = await _simulatorConnection.ConnectAsync();
         if (IsConnected && CorrectDrift)
         {
@@ -147,10 +167,130 @@ public partial class MainViewModel : ObservableObject
                 true,
                 TimeSpan.FromMinutes(SelectedDriftInterval.Minutes));
         }
+        if (IsConnected)
+        {
+            await RefreshInsStateAsync();
+            _insStateTimer.Start();
+        }
         ConnectionAction = IsConnected ? "Disconnect" : "Connect";
         ConnectionStatus = IsConnected
             ? "MSFS connected"
             : _simulatorConnection.LastError ?? "Connection failed";
+    }
+
+    private async void RefreshInsState(object? sender, EventArgs eventArgs) =>
+        await RefreshInsStateAsync();
+
+    private async Task RefreshInsStateAsync()
+    {
+        if (!IsConnected || _isRefreshingInsState) return;
+
+        _isRefreshingInsState = true;
+        try
+        {
+            using var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(3));
+            var state = await _simulatorConnection.GetInsStateAsync(timeout.Token);
+            FromSlot = state.FromSlot.ToString();
+            ToSlot = state.ToSlot.ToString();
+            Accuracy = state.AccuracyIndex.ToString("0.0");
+
+            if (DateTimeOffset.UtcNow - _lastSlotRefresh >= TimeSpan.FromSeconds(5))
+                await RefreshSlotsFromAircraftAsync();
+
+            var stateChanged = state.FromSlot != _lastObservedFromSlot
+                || state.ToSlot != _lastObservedToSlot;
+            if (stateChanged && AutoManageWaypoints && IsRouteLoaded)
+                await RefillUpcomingSlotsAsync(state.FromSlot, state.ToSlot);
+
+            _lastObservedFromSlot = state.FromSlot;
+            _lastObservedToSlot = state.ToSlot;
+        }
+        catch (OperationCanceledException)
+        {
+        }
+        catch (Exception)
+        {
+            _insStateTimer.Stop();
+            IsConnected = false;
+            ConnectionAction = "Connect";
+            ConnectionStatus = _simulatorConnection.LastError ?? "MSFS disconnected";
+        }
+        finally
+        {
+            _isRefreshingInsState = false;
+        }
+    }
+
+    private async Task RefreshSlotsFromAircraftAsync()
+    {
+        _lastSlotRefresh = DateTimeOffset.UtcNow;
+        using var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(4));
+        var aircraftSlots = await _simulatorConnection.GetInsWaypointsAsync(timeout.Token);
+        var route = FlightPlan.Select(leg => leg.Waypoint).ToArray();
+
+        foreach (var aircraftSlot in aircraftSlots)
+        {
+            Waypoint? waypoint = null;
+            var isEmpty = Math.Abs(aircraftSlot.Latitude) < 0.000001
+                && Math.Abs(aircraftSlot.Longitude) < 0.000001;
+
+            if (!isEmpty)
+            {
+                waypoint = InsWaypointMatcher.FindClosest(
+                    route,
+                    aircraftSlot.Latitude,
+                    aircraftSlot.Longitude)
+                    ?? new Waypoint(
+                        $"MAN-{aircraftSlot.SlotNumber}",
+                        aircraftSlot.Latitude,
+                        aircraftSlot.Longitude);
+            }
+
+            SetSlot(
+                aircraftSlot.SlotNumber,
+                waypoint,
+                isEmpty ? "Empty" : "Aircraft");
+        }
+    }
+
+    private async Task RefillUpcomingSlotsAsync(int fromSlot, int toSlot)
+    {
+        if (fromSlot is < 1 or > 9 || toSlot is < 1 or > 9) return;
+
+        var toWaypoint = Slots[toSlot].Waypoint;
+        if (toWaypoint is null) return;
+
+        var toRouteIndex = -1;
+        for (var index = 0; index < FlightPlan.Count; index++)
+        {
+            if (ReferenceEquals(FlightPlan[index].Waypoint, toWaypoint))
+            {
+                toRouteIndex = index;
+                break;
+            }
+        }
+
+        if (toRouteIndex < 0) return;
+
+        var updatedSlots = 0;
+        var refillPlan = InsSlotPlanner.BuildRefillPlan(
+            fromSlot,
+            toSlot,
+            toRouteIndex,
+            FlightPlan.Count);
+
+        foreach (var assignment in refillPlan)
+        {
+            var waypoint = FlightPlan[assignment.RouteIndex].Waypoint;
+            if (ReferenceEquals(Slots[assignment.SlotNumber].Waypoint, waypoint)) continue;
+
+            await _simulatorConnection.SendWaypointAsync(assignment.SlotNumber, waypoint);
+            SetSlot(assignment.SlotNumber, waypoint, "Synced");
+            updatedSlots++;
+        }
+
+        if (updatedSlots > 0)
+            RouteStatus = $"Auto-synced {updatedSlots} upcoming INS slots";
     }
 
     [RelayCommand]
@@ -173,6 +313,9 @@ public partial class MainViewModel : ObservableObject
             var route = await _routeProvider.GetLatestRouteAsync(pilotId);
             PopulateFlightPlan(route);
             ResyncSlots(0, 1);
+            _lastObservedFromSlot = null;
+            _lastObservedToSlot = null;
+            _lastSlotRefresh = DateTimeOffset.MinValue;
             RouteStatus = $"Flight plan downloaded · {route.Count} waypoints";
             DownloadStatus = "Success";
             IsRouteLoaded = true;

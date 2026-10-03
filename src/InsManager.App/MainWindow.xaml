@@ -5,7 +5,7 @@
         Icon="Assets/ins.ico"
         Width="760"
         Height="560"
-        ResizeMode="NoResize"
+        ResizeMode="CanMinimize"
         WindowStartupLocation="CenterScreen"
         Background="{DynamicResource WindowBackgroundBrush}"
         Foreground="{DynamicResource PrimaryTextBrush}">
